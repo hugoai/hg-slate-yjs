@@ -13,21 +13,21 @@ const transforms = [
       {
         marks: [],
         offset: 0,
-        path: List([0, 0]),
+        path: [0, 0],
         text: 'Hello ',
         type: 'insert_text'
       },
       {
         marks: [],
         offset: 6,
-        path: List([0, 0]),
+        path: [0, 0],
         text: 'collaborator',
         type: 'insert_text'
       },
       {
         marks: [],
         offset: 18,
-        path: List([0, 0]),
+        path: [0, 0],
         text: '!',
         type: 'insert_text'
       }
@@ -44,15 +44,17 @@ const transforms = [
     [
       {
         offset: 11,
-        path: List([0, 0]),
+        path: [0, 0],
         text: 'borator',
-        type: 'remove_text'
+        type: 'remove_text',
+        marks: []
       },
       {
         offset: 5,
-        path: List([0, 0]),
+        path: [0, 0],
         text: ' colla',
-        type: 'remove_text'
+        type: 'remove_text',
+        marks: []
       }
     ],
     [
@@ -67,12 +69,12 @@ const transforms = [
     [
       {
         type: 'insert_node',
-        path: List([1]),
+        path: [1],
         node: createLine([])
       },
       {
         type: 'insert_node',
-        path: List([1, 0]),
+        path: [1, 0],
         node: createText('Hello collaborator!')
       }
     ],
@@ -89,14 +91,14 @@ const transforms = [
     ],
     [
       {
-        path: List([1]),
+        path: [1],
         position: 1,
         properties: { type: 'line' },
         target: null,
         type: 'merge_node'
       },
       {
-        path: List([0, 1]),
+        path: [0, 1],
         position: 6,
         properties: {},
         target: null,
@@ -117,13 +119,13 @@ const transforms = [
     ],
     [
       {
-        newPath: List([0]),
-        path: List([1]),
+        newPath: [0],
+        path: [1],
         type: 'move_node'
       },
       {
-        newPath: List([3, 0]),
-        path: List([2, 0]),
+        newPath: [3, 0],
+        path: [2, 0],
         type: 'move_node'
       }
     ],
@@ -143,11 +145,11 @@ const transforms = [
     ],
     [
       {
-        path: List([1, 0]),
+        path: [1, 0],
         type: 'remove_node'
       },
       {
-        path: List([0]),
+        path: [0],
         type: 'remove_node'
       }
     ],
@@ -163,24 +165,15 @@ const transforms = [
       createLine([createText('second')])
     ],
     [
-      // TODO: Rework throughout this file (not just this test case) such that
-      // we have Operations in this slot instead of POJOs. TBD: maybe some
-      // helper functions, or map Operation.create over the POJOs in the test
-      // code?
-      // 
-      // But for now, create an Operation explicitly for this test case, good
-      // enough to get things working + unblocked.
-      Operation.create(
-        {
-          path: List([0]),
-          type: 'set_node',
-          properties: {
-            data: {
-              test: '4567'
-            },
+      {
+        path: [0],
+        type: 'set_node',
+        properties: {
+          data: {
+            test: '4567'
           },
         },
-      ),
+      },
     ],
     [
       createLine([createText('first')], { test: '4567' }),
@@ -194,13 +187,16 @@ const transforms = [
     ],
     [
       {
-        path: List([0, 0]),
+        path: [0, 0],
         position: 6,
+        properties: {
+          type: 'text'
+        },
         target: null,
         type: 'split_node'
       },
       {
-        path: List([0]),
+        path: [0],
         position: 1,
         properties: {
           type: 'line'
@@ -225,7 +221,7 @@ describe('apply slate operations to document', () => {
       const syncDoc = doc.getArray('content');
 
       doc.transact(() => {
-        applySlateOps(syncDoc, operations);
+        applySlateOps(syncDoc, operations.map(Operation.create));
       });
 
       expect(output.map(nodeToJSON)).toStrictEqual(toSlateDoc(syncDoc).map(nodeToJSON));
