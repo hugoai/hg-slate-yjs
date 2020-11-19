@@ -1,7 +1,6 @@
 const { TestEditor } = require('./testEditor');
 const { toSlateDoc } = require('../src');
 const { createLine, createText } = require('./utils');
-const { List } = require('immutable');
 
 const initialState = [
   createLine([createText('alfa bravo')]),
@@ -13,35 +12,35 @@ const initialState = [
 const tests = [
   {
     name: 'Insert text into 1st paragraph',
-    transform: TestEditor.makeInsertText('india ', { path: List([0, 0]), offset: 5}),
+    transform: TestEditor.makeInsertText('india ', { path: [0, 0], offset: 5}),
   },
   {
     name: 'Insert text into 2nd paragraph',
-    transform: TestEditor.makeInsertText('juliett ', { path: List([1, 0]), offset: 8}),
+    transform: TestEditor.makeInsertText('juliett ', { path: [1, 0], offset: 8}),
   },
   {
     name: 'Insert text into 3rd paragraph',
-    transform: TestEditor.makeInsertText('kilo ', { path: List([2, 0]), offset: 5}),
+    transform: TestEditor.makeInsertText('kilo ', { path: [2, 0], offset: 5}),
   },
   {
     name: 'Insert text into 4th paragraph',
-    transform: TestEditor.makeInsertText('lima ', { path: List([3, 0]), offset: 5}),
+    transform: TestEditor.makeInsertText('lima ', { path: [3, 0], offset: 5}),
   },
   {
     name: 'Delete text from 1st paragraph',
-    transform: TestEditor.makeRemoveCharacters(5, { path: List([0, 0]), offset: 2}),
+    transform: TestEditor.makeRemoveCharacters(5, { path: [0, 0], offset: 2}),
   },
   {
     name: 'Delete text from 2nd paragraph',
-    transform: TestEditor.makeRemoveCharacters(6, { path: List([1, 0]), offset: 4}),
+    transform: TestEditor.makeRemoveCharacters(6, { path: [1, 0], offset: 4}),
   },
   {
     name: 'Delete text from 3nd paragraph',
-    transform: TestEditor.makeRemoveCharacters(5, { path: List([2, 0]), offset: 3}),
+    transform: TestEditor.makeRemoveCharacters(5, { path: [2, 0], offset: 3}),
   },
   {
     name: 'Delete text from 4th paragraph',
-    transform: TestEditor.makeRemoveCharacters(7, { path: List([3, 0]), offset: 1}),
+    transform: TestEditor.makeRemoveCharacters(7, { path: [3, 0], offset: 1}),
   },
   {
     name: 'Insert new paragraph before 1st',
@@ -125,19 +124,19 @@ const tests = [
   },
   {
     name: 'Split 1st paragraph',
-    transform: TestEditor.makeSplitNodes({ path: List([0, 0]), offset: 4}),
+    transform: TestEditor.makeSplitNodes({ path: [0, 0], offset: 4}),
   },
   {
     name: 'Split 2nd paragraph',
-    transform: TestEditor.makeSplitNodes({ path: List([1, 0]), offset: 5}),
+    transform: TestEditor.makeSplitNodes({ path: [1, 0], offset: 5}),
   },
   {
     name: 'Split 3rd paragraph',
-    transform: TestEditor.makeSplitNodes({ path: List([2, 0]), offset: 6}),
+    transform: TestEditor.makeSplitNodes({ path: [2, 0], offset: 6}),
   },
   {
     name: 'Split 4th paragraph',
-    transform: TestEditor.makeSplitNodes({ path: List([3, 0]), offset: 7}),
+    transform: TestEditor.makeSplitNodes({ path: [3, 0], offset: 7}),
   },
   {
     name: 'Move 1st paragraph',
