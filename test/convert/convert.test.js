@@ -18,6 +18,10 @@ const tests = [
       createMention([createText('@jkl')])
     ])
   ],
+  [
+    'block node with properties',
+    createLine([createText('mno')], { pqr: 'stu' })
+  ],
 ];
 
 const nodeToJS = (node) => node.toJS();
