@@ -2,6 +2,7 @@ const { Value } = require('slate');
 const Y = require('yjs');
 const { applySlateOps } = require('../src/apply');
 const { toSlateOps } = require('../src/convert');
+const { List } = require('immutable');
 
 const TestEditor = {
   /**
@@ -134,7 +135,7 @@ const TestEditor = {
    */
   makeInsertText(text, at) {
     return (e) => {
-      const change = e.slateDoc.change().insertTextByPath(at.path, at.offset, text);
+      const change = e.slateDoc.change().insertTextByPath(List(at.path), at.offset, text);
       TestEditor.applySlateOpsToYjs(e, change.operations);
       e.slateDoc = change.value;
     };
@@ -145,7 +146,7 @@ const TestEditor = {
    */
   makeRemoveCharacters(count, at) {
     return (e) => {
-      const change = e.slateDoc.change().removeTextByPath(at.path, at.offset, count);
+      const change = e.slateDoc.change().removeTextByPath(List(at.path), at.offset, count);
       TestEditor.applySlateOpsToYjs(e, change.operations);
       e.slateDoc = change.value;
     };
@@ -157,7 +158,7 @@ const TestEditor = {
   makeInsertNodes(nodes, path) {
     return (e) => {
       let idx = path[path.length - 1];
-      path = path.slice(0, -1);
+      path = List(path.slice(0, -1));
       nodes.forEach((node) => {
         const change = e.slateDoc.change().insertNodeByPath(path, idx++, node);
         TestEditor.applySlateOpsToYjs(e, change.operations);
@@ -171,7 +172,7 @@ const TestEditor = {
    */
   makeMergeNodes(path) {
     return (e) => {
-      const change = e.slateDoc.change().mergeNodeByPath(path);
+      const change = e.slateDoc.change().mergeNodeByPath(List(path));
       TestEditor.applySlateOpsToYjs(e, change.operations);
       e.slateDoc = change.value;
     };
@@ -184,7 +185,7 @@ const TestEditor = {
     return (e) => {
       let idx = to[to.length - 1];
       to = to.slice(0, -1); 
-      const change = e.slateDoc.change().moveNodeByPath(from, to, idx);
+      const change = e.slateDoc.change().moveNodeByPath(List(from), List(to), idx);
       TestEditor.applySlateOpsToYjs(e, change.operations);
       e.slateDoc = change.value;
     };
@@ -195,18 +196,18 @@ const TestEditor = {
    */
   makeRemoveNodes(path) {
     return (e) => {
-      const change = e.slateDoc.change().removeNodeByPath(path);
+      const change = e.slateDoc.change().removeNodeByPath(List(path));
       TestEditor.applySlateOpsToYjs(e, change.operations);
       e.slateDoc = change.value;
     };
   },
 
   /**
-   * makeSetNodes(at: Location, props: Partial<Node>): TransformFunc
+   * makeSetNodes(at: Path, props: Partial<Node>): TransformFunc
    */
-  makeSetNodes(at, props) {
+  makeSetNodes(path, props) {
     return (e) => {
-      const change = e.slateDoc.change().setNodeByPath(at, { data: props });
+      const change = e.slateDoc.change().setNodeByPath(List(path), { data: props });
       TestEditor.applySlateOpsToYjs(e, change.operations);
       e.slateDoc = change.value;
     };
@@ -217,7 +218,7 @@ const TestEditor = {
    */
   makeSplitNodes(at) {
     return (e) => {
-      const c = e.slateDoc.change().moveTo(at.path, at.offset);
+      const c = e.slateDoc.change().moveTo(List(at.path), at.offset);
       const change = c.value.change().splitBlock();
       TestEditor.applySlateOpsToYjs(e, change.operations);
       e.slateDoc = change.value;
