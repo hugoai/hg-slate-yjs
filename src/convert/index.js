@@ -1,8 +1,7 @@
-const _ = require('lodash');
-const Y = require('yjs');
-const arrayEvent = require('./arrayEvent');
-const mapEvent = require('./mapEvent');
-const textEvent = require('./textEvent');
+const _ = require("lodash");
+const arrayEvent = require("./arrayEvent");
+const mapEvent = require("./mapEvent");
+const textEvent = require("./textEvent");
 
 /**
  * Converts yjs events into slate operations.
@@ -19,19 +18,19 @@ const toSlateOps = (events) => {
  * toSlateOp(event: Y.YEvent): Operation[]
  */
 const toSlateOp = (event) => {
-  if (event instanceof Y.YArrayEvent) {
+  if (event.constructor.name === "YArrayEvent") {
     return arrayEvent(event);
   }
 
-  if (event instanceof Y.YMapEvent) {
+  if (event.constructor.name === "YMapEvent") {
     return mapEvent(event);
   }
 
-  if (event instanceof Y.YTextEvent) {
+  if (event.constructor.name === "YTextEvent") {
     return textEvent(event);
   }
 
-  throw new Error('Unsupported yjs event');
+  throw new Error("Unsupported yjs event");
 };
 
 module.exports = { toSlateOps, toSlateOp };

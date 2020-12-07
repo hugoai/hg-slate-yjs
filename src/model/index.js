@@ -25,7 +25,7 @@ const SyncNode = {
    * getChildren(node: SyncNode): Y.Array<SyncElement> | undefined
    */
   getChildren(node) {
-    if (node instanceof Y.Array) {
+    if (node && node.constructor.name === "YArray") {
       return node;
     }
 
@@ -36,7 +36,7 @@ const SyncNode = {
    * getText(node: SyncNode): Y.Text | undefined
    */
   getText(node) {
-    if (node instanceof Y.Array) {
+    if (node && node.constructor.name === "YArray") {
       return undefined;
     }
 

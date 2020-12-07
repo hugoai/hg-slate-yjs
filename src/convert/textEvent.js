@@ -1,4 +1,3 @@
-const Y = require('yjs');
 const { toSlatePath } = require('../utils/convert');
 
 /**
@@ -37,7 +36,7 @@ const textEvent = (event) => {
       while (text.length < d.delete) {
         const item = removedValues.next().value;
         const { content } = item;
-        if (!(content instanceof Y.ContentString)) {
+        if (!(content && content.constructor.name === "ContentString")) {
           throw new TypeError(`Unsupported content type ${item.content}`);
         }
         text = text.concat(content.str);
