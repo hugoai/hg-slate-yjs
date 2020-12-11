@@ -39,7 +39,13 @@ const createValue = (children) => ({
 
 const createDoc = (children) => {
   const doc = new Y.Doc();
-  toSyncDoc(doc.getArray('content'), createValue(children).children);
+  const innerDocument = new Y.Array()
+
+  toSyncDoc(innerDocument, createValue(children).children)
+
+  doc.getMap('content').set('document', innerDocument)
+  doc.getMap('content').set('data', new Y.Map())
+
   return doc;
 };
 
