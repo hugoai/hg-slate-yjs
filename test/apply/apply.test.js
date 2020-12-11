@@ -273,7 +273,21 @@ describe('apply slate "set_value" operations to document', () => {
   });
 });
 
-      expect(output.map(nodeToJSON)).toStrictEqual(toSlateDoc(syncDoc).map(nodeToJSON));
+describe('apply Invalid slate operation to document', () => {
+  const [op, input, operations, output] = setValueTransform
+  it(`should not change the document`, () => {
+    const doc = createDoc(input);
+    const content = doc.getMap('content')
+
+    doc.transact(() => {
+      applySlateOp(content, {type:'invalid'});
     });
+
+    const syncDocMapForAssertion = content.get('data')
+    const syncDocArrayForAssertion = content.get('document');
+
+    expect(output.map(nodeToJSON)).toStrictEqual(toSlateDoc(syncDocArrayForAssertion).map(nodeToJSON));
+    expect({}).toStrictEqual(syncDocMapForAssertion.toJSON());
+
   });
 });
