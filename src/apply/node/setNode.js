@@ -7,7 +7,8 @@ const { getTarget } = require('../../path');
  * setNode(doc: SyncDoc, op: SetNodeOperation): SyncDoc
  */
 const setNode = (doc, op) => {
-  const node = getTarget(doc, op.path);
+  const syncDoc = doc.get('document')
+  const node = getTarget(syncDoc, op.path);
 
   const properties = node.get('data');
   for (const [key, value] of Object.entries(op.properties.data.toJSON())) {

@@ -8,8 +8,9 @@ const { cloneSyncElement } = require('../../utils/clone');
  * moveNode(doc: SyncDoc, op: MoveNodeOperation): SyncDoc
  */
 const moveNode = (doc, op) => {
-  const [from, fromIndex] = getParent(doc, op.path);
-  const [to, toIndex] = getParent(doc, op.newPath);
+  const syncDoc = doc.get('document')
+  const [from, fromIndex] = getParent(syncDoc, op.path);
+  const [to, toIndex] = getParent(syncDoc, op.newPath);
 
   if (
     SyncNode.getText(from) !== undefined ||

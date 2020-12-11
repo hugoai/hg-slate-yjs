@@ -7,7 +7,8 @@ const { getTarget } = require('../../path');
  * insertText(doc: SyncDoc, op: InsertTextOperation): SyncDoc
  */
 const insertText = (doc, op) => {
-  const node = getTarget(doc, op.path);
+  const syncDoc = doc.get('document')
+  const node = getTarget(syncDoc, op.path);
   const nodeText = SyncElement.getText(node);
   nodeText.insert(op.offset, op.text);
   return doc;
