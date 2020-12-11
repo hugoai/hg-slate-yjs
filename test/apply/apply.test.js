@@ -218,7 +218,17 @@ describe('apply slate operations to document', () => {
   transforms.forEach(([op, input, operations, output]) => {
     it(`apply ${op} operations`, () => {
       const doc = createDoc(input);
-      const syncDoc = doc.getArray('content');
+      const content = doc.getMap('content')
+      
+      doc.transact(() => {
+        applySlateOps(content, operations.map(Operation.create));
+      });
+
+      const syncDocForAssertion = content.get('document');
+      expect(output.map(nodeToJSON)).toStrictEqual(toSlateDoc(syncDocForAssertion).map(nodeToJSON));
+    });
+  });
+});
 
       doc.transact(() => {
         applySlateOps(syncDoc, operations.map(Operation.create));
