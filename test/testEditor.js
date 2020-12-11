@@ -13,7 +13,7 @@ const TestEditor = {
 
     e.slateDoc = Value.create();
     e.doc = new Y.Doc();
-    e.syncDoc = e.doc.getArray('content');
+    e.syncDoc = e.doc.getMap('content');
     e.shouldCaptureYjsUpdates = true;
     e.capturedYjsUpdates = [];
 
@@ -25,6 +25,8 @@ const TestEditor = {
       TestEditor.applyYjsEventsToSlate(e, events);
     });
 
+    e.syncDoc.set('document', new Y.Array())
+    
     return e;
   },
 

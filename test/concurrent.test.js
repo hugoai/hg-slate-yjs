@@ -171,8 +171,8 @@ const runOneTest = async (ti, tj) => {
   // Verify initial states match.
   expect(ei.slateDoc.document.nodes.toArray().map(nodeToJSON))
     .toEqual(ej.slateDoc.document.nodes.toArray().map(nodeToJSON));
-  expect(toSlateDoc(ei.syncDoc).map(nodeToJSON))
-    .toEqual(toSlateDoc(ej.syncDoc).map(nodeToJSON));
+  expect(toSlateDoc(ei.syncDoc.get('document')).map(nodeToJSON))
+    .toEqual(toSlateDoc(ej.syncDoc.get('document')).map(nodeToJSON));
 
   // Apply 1st transform to 1st editor, capture updates.
   TestEditor.applyTransform(ei, ti.transform);
@@ -189,8 +189,8 @@ const runOneTest = async (ti, tj) => {
   // Verify final states match.
   expect(ei.slateDoc.document.nodes.toArray().map(nodeToJSON))
     .toEqual(ej.slateDoc.document.nodes.toArray().map(nodeToJSON));
-  expect(toSlateDoc(ei.syncDoc).map(nodeToJSON))
-    .toEqual(toSlateDoc(ej.syncDoc).map(nodeToJSON));
+  expect(toSlateDoc(ei.syncDoc.get('document')).map(nodeToJSON))
+    .toEqual(toSlateDoc(ej.syncDoc.get('document')).map(nodeToJSON));
 }
 
 describe('model concurrent edits in separate editors', () => {

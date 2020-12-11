@@ -331,8 +331,8 @@ describe('slate operations propagate between editors', () => {
       // Verify initial states.
       const inputAsJSON = input.map(nodeToJSON);
       expect(src.slateDoc.document.nodes.toArray().map(nodeToJSON)).toStrictEqual(inputAsJSON);
-      expect(toSlateDoc(src.syncDoc).map(nodeToJSON)).toStrictEqual(inputAsJSON);
-      expect(toSlateDoc(dst.syncDoc).map(nodeToJSON)).toStrictEqual(inputAsJSON);
+      expect(toSlateDoc(src.syncDoc.get('document')).map(nodeToJSON)).toStrictEqual(inputAsJSON);
+      expect(toSlateDoc(dst.syncDoc.get('document')).map(nodeToJSON)).toStrictEqual(inputAsJSON);
       expect(dst.slateDoc.document.nodes.toArray().map(nodeToJSON)).toStrictEqual(inputAsJSON);
 
       // Allow for multiple rounds of applying transforms and verifying state.
@@ -348,8 +348,8 @@ describe('slate operations propagate between editors', () => {
         // Verify final states.
         const outputAsJSON = output.map(nodeToJSON);
         expect(src.slateDoc.document.nodes.toArray().map(nodeToJSON)).toStrictEqual(outputAsJSON);
-        expect(toSlateDoc(src.syncDoc).map(nodeToJSON)).toStrictEqual(outputAsJSON);
-        expect(toSlateDoc(dst.syncDoc).map(nodeToJSON)).toStrictEqual(outputAsJSON);
+        expect(toSlateDoc(src.syncDoc.get('document')).map(nodeToJSON)).toStrictEqual(outputAsJSON);
+        expect(toSlateDoc(dst.syncDoc.get('document')).map(nodeToJSON)).toStrictEqual(outputAsJSON);
         expect(dst.slateDoc.document.nodes.toArray().map(nodeToJSON)).toStrictEqual(outputAsJSON);
       }
     });
