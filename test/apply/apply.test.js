@@ -1,4 +1,4 @@
-const { applySlateOps, toSlateDoc } = require('../../src');
+const { applySlateOps, toSlateDoc, applySlateOp } = require('../../src');
 const { createLine, createDoc, createNode, createText } = require('../utils');
 const { List } = require('immutable');
 const { Operation } = require('slate');
@@ -230,9 +230,48 @@ describe('apply slate operations to document', () => {
   });
 });
 
-      doc.transact(() => {
-        applySlateOps(syncDoc, operations.map(Operation.create));
-      });
+const setValueTransform = [
+  'set_value',
+    [
+      createLine([createText('Hello collaborator!')])
+    ],
+    {
+      type: 'set_value',
+      properties: {
+        createdBy:{
+          emailAddress: "danielblank07@gmail.com",
+          id: "ac8e5fe7-af4e-4281-b1e2-53630606e7c6",
+          name: "Daniel Blank",
+          pictureUrl: "https://lh4.googleusercontent.com/-Au4KLfih-zQ/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rcJjTL-m5CILVsClpS2Om3OQycCcQ/photo.jpg",
+          teamId: "8d930c14-9116-4984-b5c8-cdee9432ae87"
+        }
+      }
+    }
+    ,
+    [
+      createLine([createText('Hello collaborator!')])
+    ],
+]
+
+
+describe('apply slate "set_value" operations to document', () => {
+  const [op, input, operations, output] = setValueTransform
+  it(`apply ${op} operations`, () => {
+    const doc = createDoc(input);
+    const content = doc.getMap('content')
+    
+    doc.transact(() => {
+      applySlateOp(content, operations);
+    });
+
+    const syncDocMapForAssertion = content.get('data')
+    const syncDocArrayForAssertion = content.get('document');
+
+    expect(output.map(nodeToJSON)).toStrictEqual(toSlateDoc(syncDocArrayForAssertion).map(nodeToJSON));
+    expect(operations['properties']).toStrictEqual(syncDocMapForAssertion.toJSON());
+
+  });
+});
 
       expect(output.map(nodeToJSON)).toStrictEqual(toSlateDoc(syncDoc).map(nodeToJSON));
     });
