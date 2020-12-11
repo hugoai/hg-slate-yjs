@@ -30,10 +30,10 @@ describe('convert', () => {
   tests.forEach(([testName, input]) => {
     it(`${testName}`, () => {
       const doc = new Y.Doc();
-      const syncDoc = doc.getArray('content');
+      const syncArray = doc.getArray('document');
 
-      toSyncDoc(syncDoc, [input]);
-      const output = toSlateDoc(syncDoc);
+      toSyncDoc(syncArray, [input]);
+      const output = toSlateDoc(syncArray);
       expect(output.map(nodeToJS)).toStrictEqual([nodeToJS(input)]);
     });
   });
