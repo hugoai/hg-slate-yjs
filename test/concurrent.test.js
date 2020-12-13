@@ -2,6 +2,8 @@ const { TestEditor } = require('./testEditor');
 const { toSlateDoc } = require('../src');
 const { createLine, createText } = require('./utils');
 
+const Y = require('yjs');
+
 const initialState = [
   createLine([createText('alfa bravo')]),
   createLine([createText('charlie delta')]),
@@ -162,6 +164,9 @@ const runOneTest = async (ti, tj) => {
   // Create two editors.
   const ei = TestEditor.create();
   const ej = TestEditor.create();
+
+  ei.syncDoc.set("data", new Y.Map())
+  ei.syncDoc.set("document", new Y.Array())
 
   // Set initial state for 1st editor, propagate changes to 2nd.
   TestEditor.applyTransform(ei, TestEditor.makeInsertNodes(initialState, [0]));
