@@ -1,7 +1,7 @@
 const { TestEditor } = require('./testEditor');
 const { toSlateDoc } = require('../src');
 const { createLine, createText } = require('./utils');
-const { List } = require('immutable');
+const Y = require('yjs');
 
 const tests = [
   [
@@ -321,6 +321,9 @@ describe('slate operations propagate between editors', () => {
       // Create two editors.
       const src = TestEditor.create();
       const dst = TestEditor.create();
+
+      src.syncDoc.set("data", new Y.Map())
+      src.syncDoc.set("document", new Y.Array())
 
       // Set initial state for src editor, propagate changes to dst editor.
       TestEditor.applyTransform(src, TestEditor.makeInsertNodes(input, [0]));
