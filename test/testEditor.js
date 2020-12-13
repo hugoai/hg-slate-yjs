@@ -25,8 +25,6 @@ const TestEditor = {
       TestEditor.applyYjsEventsToSlate(e, events);
     });
 
-    e.syncDoc.set('document', new Y.Array())
-    
     return e;
   },
 
