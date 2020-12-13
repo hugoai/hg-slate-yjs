@@ -13,15 +13,26 @@ const { toSlatePath } = require('../utils/convert');
  * mapEvent(event: Y.YMapEvent<any>): SetNodeOperation[]
  */
 const mapEvent = (event) => {
+  
+  /**
+   * convertMapOp(targetElement: event.target, key: string): json | string
+   */
+  const convertChildToSlate = (targetElement, key)=>{
+    if(["YMap","YArray","YText"].includes(targetElement.get(key).constructor.name)){
+      return targetElement.get(key).toJSON()
+    }
+    return targetElement.get(key)
+  }
+
+
   /**
    * convertMapOp(actionEntry: [string, MapAction]): SetNodeOperationProperties
    */
   const convertMapOp = (actionEntry) => {
     const [key, action] = actionEntry;
     const targetElement = event.target;
-
     return {
-      properties: { [key]: targetElement.get(key) },
+      properties: { [key]: convertChildToSlate(targetElement, key)},
     };
   };
 
