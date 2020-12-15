@@ -49,11 +49,9 @@ const mapEvent = (event) => {
 
   const keys = event.changes.keys;
   const changes = Array.from(keys.entries(), convertMapOp);
-
-  for( var [key, action] of keys.entries()){}
   
   var baseOp = {
-      type: (key === 'data' && action.action === 'update' && !event.path.length)?'set_value':'set_node',
+      type: (keys.has('data') && keys.get('data').action === 'update' && !event.path.length)?'set_value':'set_node',
       newProperties: {},
       properties: {},
       path: toSlatePath(event.path),
