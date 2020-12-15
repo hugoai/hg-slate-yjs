@@ -224,6 +224,16 @@ const TestEditor = {
       e.slateDoc = change.value;
     };
   },
+  /**
+   * makeSetValue(Properties: Properties): TransformFunc
+   */
+  makeSetValue(properties) {
+    return (e) => {
+      const change = e.slateDoc.change().setValue({data: properties})
+      TestEditor.applySlateOpsToYjs(e, change.operations);
+      e.slateDoc = change.value;
+    };
+  },
 };
 
 module.exports = { TestEditor };
