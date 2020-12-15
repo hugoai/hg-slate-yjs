@@ -311,6 +311,20 @@ const tests = [
     [TestEditor.makeRemoveCharacters(7, { path: [0, 0], offset: 1 })],
     [createLine([createText('at')])],
   ],
+  [
+    'Set Value to slate and Yjs',
+    [createLine([createText('')])],
+    [
+      TestEditor.makeSetValue({createdBy:{
+        emailAddress: "danielblank07@gmail.com",
+        id: "ac8e5fe7-af4e-4281-b1e2-53630606e7c6",
+        name: "Daniel Blank",
+        pictureUrl: "https://lh4.googleusercontent.com/-Au4KLfih-zQ/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rcJjTL-m5CILVsClpS2Om3OQycCcQ/photo.jpg",
+        teamId: "8d930c14-9116-4984-b5c8-cdee9432ae87"
+      }})
+    ],
+    [createLine([createText('')])],
+  ],
 ];
 
 const nodeToJSON = (node) => node.toJSON();
@@ -353,7 +367,10 @@ describe('slate operations propagate between editors', () => {
         expect(src.slateDoc.document.nodes.toArray().map(nodeToJSON)).toStrictEqual(outputAsJSON);
         expect(toSlateDoc(src.syncDoc.get('document')).map(nodeToJSON)).toStrictEqual(outputAsJSON);
         expect(toSlateDoc(dst.syncDoc.get('document')).map(nodeToJSON)).toStrictEqual(outputAsJSON);
+        expect(dst.syncDoc.get('data').toJSON()).toStrictEqual(src.syncDoc.get('data').toJSON());
         expect(dst.slateDoc.document.nodes.toArray().map(nodeToJSON)).toStrictEqual(outputAsJSON);
+        expect(src.slateDoc.data.toJSON()).toStrictEqual(dst.slateDoc.data.toJSON());
+
       }
     });
   });
