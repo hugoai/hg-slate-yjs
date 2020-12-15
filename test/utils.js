@@ -1,4 +1,4 @@
-const { Block, Inline, Text } = require('slate');
+const { Block, Inline, Text, Value } = require('slate');
 const Y = require('yjs');
 const { toSyncDoc } = require('../src');
 
@@ -37,6 +37,10 @@ const createValue = (children) => ({
   children: children || [createNode()]
 });
 
+const createSlateValue = (properties) => {
+  return Value.create().change().setValue({data:properties}).value.data
+}
+
 const createDoc = (children) => {
   const doc = new Y.Doc();
   const innerDocument = new Y.Array()
@@ -49,4 +53,4 @@ const createDoc = (children) => {
   return doc;
 };
 
-module.exports = { createLine, createMention, createText, createDoc };
+module.exports = { createLine, createMention, createText, createDoc, createSlateValue };
