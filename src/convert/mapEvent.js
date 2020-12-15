@@ -52,22 +52,13 @@ const mapEvent = (event) => {
 
   for( var [key, action] of keys.entries()){}
   
-  var baseOp;
-  if(key === 'data' && action.action === 'update' && !event.path.length){
-    baseOp = {
-      type: 'set_value',
+  var baseOp = {
+      type: (key === 'data' && action.action === 'update' && !event.path.length)?'set_value':'set_node',
       newProperties: {},
       properties: {},
       path: toSlatePath(event.path),
     };
-  }else{
-    baseOp = {
-      type: 'set_node',
-      newProperties: {},
-      properties: {},
-      path: toSlatePath(event.path),
-    };
-  }
+
 
   // Combine changes into a single set node operation
   return [changes.reduce(combineMapOp, baseOp)];
