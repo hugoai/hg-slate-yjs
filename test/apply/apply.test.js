@@ -1,7 +1,8 @@
-const { applySlateOps, toSlateDoc, applySlateOp } = require('../../src');
-const { createLine, createDoc, createNode, createText } = require('../utils');
+const { applySlateOp, applySlateOps, toSlateDoc} = require('../../src');
+const { createLine, createDoc, createText, createSlateValue } = require('../utils');
 const { List } = require('immutable');
 const { Operation } = require('slate');
+const Y = require("yjs")
 
 const transforms = [
   [
@@ -235,9 +236,23 @@ const setValueTransform = [
     [
       createLine([createText('Hello collaborator!')])
     ],
-    {
+    [{
       type: 'set_value',
       properties: {
+        data:{
+          createdBy:{
+            emailAddress: "danielblank07@gmail.com",
+            id: "ac8e5fe7-af4e-4281-b1e2-53630606e7c6",
+            name: "Daniel Blank",
+            pictureUrl: "https://lh4.googleusercontent.com/-Au4KLfih-zQ/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rcJjTL-m5CILVsClpS2Om3OQycCcQ/photo.jpg",
+            teamId: "8d930c14-9116-4984-b5c8-cdee9432ae87"
+          }
+        }
+      }
+    }]
+    ,
+    [
+      createSlateValue({
         createdBy:{
           emailAddress: "danielblank07@gmail.com",
           id: "ac8e5fe7-af4e-4281-b1e2-53630606e7c6",
@@ -245,10 +260,7 @@ const setValueTransform = [
           pictureUrl: "https://lh4.googleusercontent.com/-Au4KLfih-zQ/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rcJjTL-m5CILVsClpS2Om3OQycCcQ/photo.jpg",
           teamId: "8d930c14-9116-4984-b5c8-cdee9432ae87"
         }
-      }
-    }
-    ,
-    [
+      }),
       createLine([createText('Hello collaborator!')])
     ],
 ]
@@ -261,15 +273,15 @@ describe('apply slate "set_value" operations to document', () => {
     const content = doc.getMap('content')
     
     doc.transact(() => {
-      applySlateOp(content, operations);
+      applySlateOps(content, operations.map(Operation.create));
     });
-
     const syncDocMapForAssertion = content.get('data')
     const syncDocArrayForAssertion = content.get('document');
-
-    expect(output.map(nodeToJSON)).toStrictEqual(toSlateDoc(syncDocArrayForAssertion).map(nodeToJSON));
-    expect(operations['properties']).toStrictEqual(syncDocMapForAssertion.toJSON());
-
+    expect(output.map(nodeToJSON))
+      .toStrictEqual([
+        syncDocMapForAssertion.toJSON(), 
+        toSlateDoc(syncDocArrayForAssertion).map(nodeToJSON)[0]
+      ]);
   });
 });
 
@@ -286,7 +298,7 @@ describe('apply Invalid slate operation to document', () => {
     const syncDocMapForAssertion = content.get('data')
     const syncDocArrayForAssertion = content.get('document');
 
-    expect(output.map(nodeToJSON)).toStrictEqual(toSlateDoc(syncDocArrayForAssertion).map(nodeToJSON));
+    expect(input.map(nodeToJSON)).toStrictEqual(toSlateDoc(syncDocArrayForAssertion).map(nodeToJSON));
     expect({}).toStrictEqual(syncDocMapForAssertion.toJSON());
 
   });
