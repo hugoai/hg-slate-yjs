@@ -280,7 +280,7 @@ describe('apply slate "set_value" operations to document', () => {
     expect(output.map(nodeToJSON))
       .toStrictEqual([
         syncDocMapForAssertion.toJSON(), 
-        toSlateDoc(syncDocArrayForAssertion).map(nodeToJSON)[0]
+        ...toSlateDoc(syncDocArrayForAssertion).map(nodeToJSON)
       ]);
   });
 });
