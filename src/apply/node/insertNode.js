@@ -9,7 +9,6 @@ const { toSyncElement } = require('../../utils/convert');
  */
 const insertNode = (doc, op) => {
   const syncDoc = doc.get('document')
-
   const [parent, index] = getParent(syncDoc, op.path);
 
   const children = SyncNode.getChildren(parent);
