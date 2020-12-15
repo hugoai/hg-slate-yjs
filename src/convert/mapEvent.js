@@ -17,7 +17,7 @@ const mapEvent = (event) => {
   /**
    * convertMapOp(targetElement: event.target, key: string): json | string
    */
-  const convertChildToSlate = (targetElement, key)=>{
+  const convertChildToSlate = (targetElement, key) => {
     if(["YMap","YArray","YText"].includes(targetElement.get(key).constructor.name)){
       return targetElement.get(key).toJSON()
     }
