@@ -50,12 +50,24 @@ const mapEvent = (event) => {
   const keys = event.changes.keys;
   const changes = Array.from(keys.entries(), convertMapOp);
 
-  const baseOp = {
-    type: 'set_node',
-    newProperties: {},
-    properties: {},
-    path: toSlatePath(event.path),
-  };
+  for( var [key, action] of keys.entries()){}
+  
+  var baseOp;
+  if(key === 'data' && action.action === 'update' && !event.path.length){
+    baseOp = {
+      type: 'set_value',
+      newProperties: {},
+      properties: {},
+      path: toSlatePath(event.path),
+    };
+  }else{
+    baseOp = {
+      type: 'set_node',
+      newProperties: {},
+      properties: {},
+      path: toSlatePath(event.path),
+    };
+  }
 
   // Combine changes into a single set node operation
   return [changes.reduce(combineMapOp, baseOp)];
