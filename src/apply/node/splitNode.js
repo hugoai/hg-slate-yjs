@@ -8,7 +8,8 @@ const { cloneSyncElement } = require('../../utils/clone');
  * splitNode(doc: SyncDoc, op: SplitNodeOperation): SyncDoc
  */
 const splitNode = (doc, op) => {
-  const [parent, index] = getParent(doc, op.path);
+  const syncDoc = doc.get('document')
+  const [parent, index] = getParent(syncDoc, op.path);
 
   const target = SyncNode.getChildren(parent).get(index);
   const inject = cloneSyncElement(target);

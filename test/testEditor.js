@@ -13,7 +13,7 @@ const TestEditor = {
 
     e.slateDoc = Value.create();
     e.doc = new Y.Doc();
-    e.syncDoc = e.doc.getArray('content');
+    e.syncDoc = e.doc.getMap('content');
     e.shouldCaptureYjsUpdates = true;
     e.capturedYjsUpdates = [];
 
@@ -220,6 +220,16 @@ const TestEditor = {
     return (e) => {
       const c = e.slateDoc.change().moveTo(List(at.path), at.offset);
       const change = c.value.change().splitBlock();
+      TestEditor.applySlateOpsToYjs(e, change.operations);
+      e.slateDoc = change.value;
+    };
+  },
+  /**
+   * makeSetValue(Properties: Properties): TransformFunc
+   */
+  makeSetValue(properties) {
+    return (e) => {
+      const change = e.slateDoc.change().setValue({data: properties})
       TestEditor.applySlateOpsToYjs(e, change.operations);
       e.slateDoc = change.value;
     };

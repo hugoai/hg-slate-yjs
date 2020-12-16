@@ -1,12 +1,14 @@
 const { Operation } = require('slate');
 const node = require('./node');
 const text = require('./text');
+const value = require('./value')
 
 const nullOp = (doc) => doc;
 
 const opMappers = {
   ...text,
   ...node,
+  ...value,
 
   // SetSelection is currently a null op since we don't support cursors
   set_selection: nullOp,

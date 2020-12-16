@@ -2,6 +2,8 @@ const { TestEditor } = require('./testEditor');
 const { toSlateDoc } = require('../src');
 const { createLine, createText } = require('./utils');
 
+const Y = require('yjs');
+
 const initialState = [
   createLine([createText('alfa bravo')]),
   createLine([createText('charlie delta')]),
@@ -91,6 +93,12 @@ const tests = [
     transform: TestEditor.makeMergeNodes([3]),
   },
   {
+    name: 'Add TopLevel data',
+    transform: TestEditor.makeSetValue({createdBy:{
+      emailAddress: "danielblank07@gmail.com",
+    }})
+  },
+  {
     name: 'Remove 1st paragraph',
     transform: TestEditor.makeRemoveNodes([0]),
   },
@@ -114,6 +122,14 @@ const tests = [
     name: 'Remove text node from 2nd paragraph',
     transform: TestEditor.makeRemoveNodes([1, 0]),
   },
+  {
+    name: 'Update the TopLevel Data 1',
+    transform: TestEditor.makeSetValue({createdBy:{
+      emailAddress: "danielblank07@gmail.com",
+      id: "ac8e5fe7-af4e-4281-b1e2-53630606e7c6",
+    }})
+  },
+  
   {
     name: 'Remove text node from 3nd paragraph',
     transform: TestEditor.makeRemoveNodes([2, 0]),
@@ -139,12 +155,30 @@ const tests = [
     transform: TestEditor.makeSplitNodes({ path: [3, 0], offset: 7}),
   },
   {
+    name: 'Update the TopLevel Data 2',
+    transform: TestEditor.makeSetValue({createdBy:{
+      emailAddress: "danielblank07@gmail.com",
+      id: "ac8e5fe7-af4e-4281-b1e2-53630606e7c6",
+      name: "Daniel Blank",
+    }})
+  },
+  {
     name: 'Move 1st paragraph',
     transform: TestEditor.makeMoveNodes([0], [3]),
   },
   {
     name: 'Move 2nd paragraph',
     transform: TestEditor.makeMoveNodes([3], [2]),
+  },
+  {
+    name: 'Update the TopLevel Data 3',
+    transform: TestEditor.makeSetValue({createdBy:{
+      emailAddress: "danielblank07@gmail.com",
+      id: "ac8e5fe7-af4e-4281-b1e2-53630606e7c6",
+      name: "Daniel Blank",
+      pictureUrl: "https://lh4.googleusercontent.com/-Au4KLfih-zQ/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rcJjTL-m5CILVsClpS2Om3OQycCcQ/photo.jpg",
+      teamId: "8d930c14-9116-4984-b5c8-cdee9432ae87"
+    }})
   },
   {
     name: 'Move 3rd paragraph',
@@ -163,6 +197,9 @@ const runOneTest = async (ti, tj) => {
   const ei = TestEditor.create();
   const ej = TestEditor.create();
 
+  ei.syncDoc.set("data", new Y.Map())
+  ei.syncDoc.set("document", new Y.Array())
+
   // Set initial state for 1st editor, propagate changes to 2nd.
   TestEditor.applyTransform(ei, TestEditor.makeInsertNodes(initialState, [0]));
   const updates = TestEditor.getCapturedYjsUpdates(ei);
@@ -171,8 +208,10 @@ const runOneTest = async (ti, tj) => {
   // Verify initial states match.
   expect(ei.slateDoc.document.nodes.toArray().map(nodeToJSON))
     .toEqual(ej.slateDoc.document.nodes.toArray().map(nodeToJSON));
-  expect(toSlateDoc(ei.syncDoc).map(nodeToJSON))
-    .toEqual(toSlateDoc(ej.syncDoc).map(nodeToJSON));
+  expect(toSlateDoc(ei.syncDoc.get('document')).map(nodeToJSON))
+    .toEqual(toSlateDoc(ej.syncDoc.get('document')).map(nodeToJSON));
+    expect(ei.syncDoc.get('data').toJSON())
+    .toEqual(ej.syncDoc.get('data').toJSON());
 
   // Apply 1st transform to 1st editor, capture updates.
   TestEditor.applyTransform(ei, ti.transform);
@@ -189,8 +228,12 @@ const runOneTest = async (ti, tj) => {
   // Verify final states match.
   expect(ei.slateDoc.document.nodes.toArray().map(nodeToJSON))
     .toEqual(ej.slateDoc.document.nodes.toArray().map(nodeToJSON));
-  expect(toSlateDoc(ei.syncDoc).map(nodeToJSON))
-    .toEqual(toSlateDoc(ej.syncDoc).map(nodeToJSON));
+  expect(toSlateDoc(ei.syncDoc.get('document')).map(nodeToJSON))
+    .toEqual(toSlateDoc(ej.syncDoc.get('document')).map(nodeToJSON));
+  expect(ei.slateDoc.data.toJSON())
+    .toEqual(ej.slateDoc.data.toJSON());
+  expect(ei.syncDoc.get('data').toJSON())
+    .toEqual(ej.syncDoc.get('data').toJSON());
 }
 
 describe('model concurrent edits in separate editors', () => {

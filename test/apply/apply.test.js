@@ -1,7 +1,8 @@
-const { applySlateOps, toSlateDoc } = require('../../src');
-const { createLine, createDoc, createNode, createText } = require('../utils');
+const { applySlateOp, applySlateOps, toSlateDoc} = require('../../src');
+const { createLine, createDoc, createText, createSlateValue } = require('../utils');
 const { List } = require('immutable');
 const { Operation } = require('slate');
+const Y = require("yjs")
 
 const transforms = [
   [
@@ -218,13 +219,87 @@ describe('apply slate operations to document', () => {
   transforms.forEach(([op, input, operations, output]) => {
     it(`apply ${op} operations`, () => {
       const doc = createDoc(input);
-      const syncDoc = doc.getArray('content');
-
+      const content = doc.getMap('content')
+      
       doc.transact(() => {
-        applySlateOps(syncDoc, operations.map(Operation.create));
+        applySlateOps(content, operations.map(Operation.create));
       });
 
-      expect(output.map(nodeToJSON)).toStrictEqual(toSlateDoc(syncDoc).map(nodeToJSON));
+      const syncDocForAssertion = content.get('document');
+      expect(output.map(nodeToJSON)).toStrictEqual(toSlateDoc(syncDocForAssertion).map(nodeToJSON));
     });
+  });
+});
+
+const setValueTransform = [
+  'set_value',
+    [
+      createLine([createText('Hello collaborator!')])
+    ],
+    [{
+      type: 'set_value',
+      properties: {
+        data:{
+          createdBy:{
+            emailAddress: "danielblank07@gmail.com",
+            id: "ac8e5fe7-af4e-4281-b1e2-53630606e7c6",
+            name: "Daniel Blank",
+            pictureUrl: "https://lh4.googleusercontent.com/-Au4KLfih-zQ/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rcJjTL-m5CILVsClpS2Om3OQycCcQ/photo.jpg",
+            teamId: "8d930c14-9116-4984-b5c8-cdee9432ae87"
+          }
+        }
+      }
+    }]
+    ,
+    [
+      createSlateValue({
+        createdBy:{
+          emailAddress: "danielblank07@gmail.com",
+          id: "ac8e5fe7-af4e-4281-b1e2-53630606e7c6",
+          name: "Daniel Blank",
+          pictureUrl: "https://lh4.googleusercontent.com/-Au4KLfih-zQ/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rcJjTL-m5CILVsClpS2Om3OQycCcQ/photo.jpg",
+          teamId: "8d930c14-9116-4984-b5c8-cdee9432ae87"
+        }
+      }),
+      createLine([createText('Hello collaborator!')])
+    ],
+]
+
+
+describe('apply slate "set_value" operations to document', () => {
+  const [op, input, operations, output] = setValueTransform
+  it(`apply ${op} operations`, () => {
+    const doc = createDoc(input);
+    const content = doc.getMap('content')
+    
+    doc.transact(() => {
+      applySlateOps(content, operations.map(Operation.create));
+    });
+    const syncDocMapForAssertion = content.get('data')
+    const syncDocArrayForAssertion = content.get('document');
+    expect(output.map(nodeToJSON))
+      .toStrictEqual([
+        syncDocMapForAssertion.toJSON(), 
+        ...toSlateDoc(syncDocArrayForAssertion).map(nodeToJSON)
+      ]);
+  });
+});
+
+describe('apply Invalid slate operation to document', () => {
+  const [op, input, operations, output] = setValueTransform
+  it(`should not change the document`, () => {
+    const doc = createDoc(input);
+    const content = doc.getMap('content')
+
+    doc.transact(() => {
+      applySlateOp(content, {type:'invalid'});
+    });
+
+    const syncDocMapForAssertion = content.get('data')
+    const syncDocArrayForAssertion = content.get('document');
+
+    expect(input.map(nodeToJSON)).toStrictEqual(toSlateDoc(syncDocArrayForAssertion).map(nodeToJSON));
+    expect({}).toStrictEqual(syncDocMapForAssertion.toJSON());
+
   });
 });

@@ -8,7 +8,8 @@ const { cloneSyncElement } = require('../../utils/clone');
  * mergeNode(doc: SyncDoc, op: MergeNodeOperation): SyncDoc
  */
 const mergeNode = (doc, op) => {
-  const [parent, index] = getParent(doc, op.path);
+  const syncDoc = doc.get('document')
+  const [parent, index] = getParent(syncDoc, op.path);
 
   const children = SyncNode.getChildren(parent);
   const prev = children.get(index - 1);

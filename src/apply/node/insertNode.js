@@ -8,7 +8,8 @@ const { toSyncElement } = require('../../utils/convert');
  * insertNode(doc: SyncDoc, op: InsertNodeOperation): SyncDoc
  */
 const insertNode = (doc, op) => {
-  const [parent, index] = getParent(doc, op.path);
+  const syncDoc = doc.get('document')
+  const [parent, index] = getParent(syncDoc, op.path);
 
   const children = SyncNode.getChildren(parent);
   if (SyncNode.getText(parent) !== undefined || !children) {

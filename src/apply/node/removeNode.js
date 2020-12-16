@@ -7,7 +7,8 @@ const { getParent } = require('../../path');
  * removeNode(doc: SyncDoc, op: RemoveNodeOperation): SyncDoc
  */
 const removeNode = (doc, op) => {
-  const [parent, index] = getParent(doc, op.path);
+  const syncDoc = doc.get('document')
+  const [parent, index] = getParent(syncDoc, op.path);
 
   if (SyncNode.getText(parent) !== undefined) {
     throw new TypeError("Can't remove node from text node");
