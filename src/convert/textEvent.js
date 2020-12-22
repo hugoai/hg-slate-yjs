@@ -26,28 +26,29 @@ const textEvent = (event) => {
   };
 
   /**
-   * createAddMarkOp(
+   * createMarkOp(
    *   offset: number, 
    *   length: number, 
    *   attributes: Object<string, string>): MarkOperation
    */
-  const createAddMarkOp = (offset, length, attributes) => {
-    // It appears that (a) an 'add_mark' op can only contain a single mark and
-    // (b) that 'retain' elements in Yjs TextEvents are aligned with this; log
-    // an error if that is not the case. (If we do see 'retain' elements that
-    // yield multiple marks, we probably need to change things such that this
-    // code can return multiple ops, one per mark.)
+  const createMarkOp = (offset, length, attributes) => {
+    // It appears that (a) an 'add_mark' or 'remove_mark' op can only contain a
+    // single mark and (b) that 'retain' elements in Yjs TextEvents are aligned
+    // with this; log an error if that is not the case. (If we do see 'retain'
+    // elements that yield multiple marks, we probably need to change things
+    // such that this code can return multiple ops, one per mark.)
     const marks = toSlateMarks(attributes);
     if (marks.length > 1) {
       console.error(`Attributes yield more than one mark: ${attributes}`);
     }
+    const mark = marks[0];
 
     return {
-      type: 'add_mark',
+      type: ((attributes[mark.type] !== null) ? 'add_mark' : 'remove_mark'),
       path: eventTargetPath,
       offset,
       length,
-      mark: marks[0],
+      mark,
     };
   };
 
@@ -61,7 +62,7 @@ const textEvent = (event) => {
     const d = delta;
     if (d.retain !== undefined) {
       if (!!d.attributes) {
-        markOps.push(createAddMarkOp(addOffset, d.retain, d.attributes));
+        markOps.push(createMarkOp(addOffset, d.retain, d.attributes));
       }
       removeOffset += d.retain;
       addOffset += d.retain;
