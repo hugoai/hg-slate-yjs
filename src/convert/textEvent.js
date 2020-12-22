@@ -1,4 +1,4 @@
-const { toSlatePath } = require('../utils/convert');
+const { toSlateMarks, toSlatePath } = require('../utils/convert');
 
 /**
  * Converts a Yjs Text event into Slate operations.
@@ -9,15 +9,45 @@ const textEvent = (event) => {
   const eventTargetPath = toSlatePath(event.path);
 
   /**
-   * createTextOp(type: 'insert_text'|'remove_text', offset: number, text: string): TextOperation
+   * createTextOp(
+   *   type: 'insert_text'|'remove_text', 
+   *   offset: number, 
+   *   text: string, 
+   *   marks: Mark[]): TextOperation
    */
-  const createTextOp = (type, offset, text) => {
+  const createTextOp = (type, offset, text, marks = []) => {
     return {
       type,
       offset,
       text,
       path: eventTargetPath,
-      marks: [],
+      marks,
+    };
+  };
+
+  /**
+   * createAddMarkOp(
+   *   offset: number, 
+   *   length: number, 
+   *   attributes: Object<string, string>): MarkOperation
+   */
+  const createAddMarkOp = (offset, length, attributes) => {
+    // It appears that (a) an 'add_mark' op can only contain a single mark and
+    // (b) that 'retain' elements in Yjs TextEvents are aligned with this; log
+    // an error if that is not the case. (If we do see 'retain' elements that
+    // yield multiple marks, we probably need to change things such that this
+    // code can return multiple ops, one per mark.)
+    const marks = toSlateMarks(attributes);
+    if (marks.length > 1) {
+      console.error(`Attributes yield more than one mark: ${attributes}`);
+    }
+
+    return {
+      type: 'add_mark',
+      path: eventTargetPath,
+      offset,
+      length,
+      mark: marks[0],
     };
   };
 
@@ -26,9 +56,13 @@ const textEvent = (event) => {
   let addOffset = 0;
   const removeOps = [];
   const addOps = [];
-  for (const delta of event.changes.delta) {
+  const markOps = [];
+  for (const delta of event.delta) {
     const d = delta;
     if (d.retain !== undefined) {
+      if (!!d.attributes) {
+        markOps.push(createAddMarkOp(addOffset, d.retain, d.attributes));
+      }
       removeOffset += d.retain;
       addOffset += d.retain;
     } else if (d.delete !== undefined) {
@@ -48,12 +82,12 @@ const textEvent = (event) => {
       }
       removeOps.push(createTextOp('remove_text', removeOffset, text));
     } else if (d.insert !== undefined) {
-      addOps.push(createTextOp('insert_text', addOffset, d.insert.join('')));
+      addOps.push(createTextOp('insert_text', addOffset, d.insert, toSlateMarks(d.attributes)));
       addOffset += d.insert.length;
     }
   }
 
-  return [...removeOps, ...addOps];
+  return [...removeOps, ...addOps, ...markOps];
 };
 
 module.exports = textEvent;

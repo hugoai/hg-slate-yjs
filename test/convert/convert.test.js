@@ -1,3 +1,4 @@
+const { Text } = require('slate');
 const { toSlateDoc, toSyncDoc } = require('../../src');
 const { createLine, createMention, createText } = require('../utils');
 const Y = require('yjs');
@@ -21,6 +22,23 @@ const tests = [
   [
     'block node with properties',
     createLine([createText('mno')], { pqr: 'stu' })
+  ],
+  [
+    'text with marks',
+    Text.create({
+      leaves: [
+        { text: 'ab' },
+        {
+          text: 'cde',
+          marks: [{ type: 'strong' }]
+        },
+        {
+          text: 'fghi',
+          marks: [{ type: 'em' }, { type: 'underline' }]
+        },
+        { text: 'jklmn' },
+      ],
+    })
   ],
 ];
 

@@ -1,4 +1,4 @@
-const { Block, Inline, Text } = require('slate');
+const { Block, Inline, Leaf, Mark, Text } = require('slate');
 const isPlainObject = require('is-plain-object');
 const Y = require('yjs');
 const { SyncElement } = require('../model');
@@ -43,8 +43,7 @@ const toSlateNode = (element) => {
   } else if (object === 'text') {
     const text = SyncElement.getText(element);
     attrs = {
-      text: text.toString(),
-      marks: Set(element.get('marks')),
+      leaves: text.toDelta().map(toSlateLeaf),
       ...attrs,
     };
     return Text.create(attrs);
@@ -52,6 +51,38 @@ const toSlateNode = (element) => {
 
   throw new Error(`Unable to convert '${object}' element`);
 };
+
+/**
+ * Converts a Quill delta element (as returned from Y.Text.toDelta()) to a slate
+ * Leaf
+ *
+ * toSlateLeaf(delta): Leaf
+ */
+const toSlateLeaf = (delta) => {
+  if (!delta.insert) {
+    throw new Error(`Unable to convert '${delta}' element`);
+  }
+
+  return Leaf.create({
+    text: delta.insert,
+    marks: toSlateMarks(delta.attributes),
+  });
+}
+
+/**
+ * Converts Yjs formatting attributes to a List of slate Marks
+ *
+ * toSlateMarks(Object<string, string>): Mark[]
+ */
+const toSlateMarks = (attributes) => {
+  const marks = [];
+  if (!!attributes) {
+    for (const markType in attributes) {
+      marks.push(Mark.create({ type: markType }));
+    }
+  }
+  return marks;
+}
 
 /**
  * Converts a SyncDoc to a Slate doc
@@ -90,7 +121,13 @@ const toSyncElement = (node) => {
   if (Text.isText(node)) {
     const textElement = new Y.Text(node.text);
     element.set('text', textElement);
-    element.set('marks', node.getMarks().toJSON());
+    let index = 0;
+    node.getLeaves().forEach(leaf => {
+      if (leaf.marks.size > 0) {
+        textElement.format(index, leaf.text.length, toFormattingAttributes(leaf.marks));
+      }
+      index += leaf.text.length;
+    });
   }
 
   for (const [key, value] of Object.entries(node.toJSON())) {
@@ -103,6 +140,19 @@ const toSyncElement = (node) => {
 };
 
 /**
+ * Converts a List of slate Marks to Yjs formatting attributes
+ *
+ * toFormattingAttributes(List<Mark>): Object<string, string>
+ */
+const toFormattingAttributes = (marks) => {
+  const result = {};
+  marks.forEach(mark => {
+    result[mark.type] = 'true';
+  })
+  return result;
+};
+
+/**
  * Converts a SyncDoc path the a slate path
  *
  * toSlatePath(path: (string | number)[]): Path
@@ -112,6 +162,8 @@ const toSlatePath = (path) => {
 };
 
 module.exports = {
+  toFormattingAttributes,
+  toSlateMarks,
   toSlateNode,
   toSlateDoc,
   toSyncDoc,
