@@ -9,7 +9,11 @@ const textEvent = (event) => {
   const eventTargetPath = toSlatePath(event.path);
 
   /**
-   * createTextOp(type: 'insert_text'|'remove_text', offset: number, text: string): TextOperation
+   * createTextOp(
+   *   type: 'insert_text'|'remove_text', 
+   *   offset: number, 
+   *   text: string, 
+   *   marks: Mark[]): TextOperation
    */
   const createTextOp = (type, offset, text, marks = []) => {
     return {
@@ -22,7 +26,10 @@ const textEvent = (event) => {
   };
 
   /**
-   * createAddMarkOp(offset: number, length: number, attributes: Object<string, string>): MarkOperation
+   * createAddMarkOp(
+   *   offset: number, 
+   *   length: number, 
+   *   attributes: Object<string, string>): MarkOperation
    */
   const createAddMarkOp = (offset, length, attributes) => {
     // It appears that (a) an 'add_mark' op can only contain a single mark and
