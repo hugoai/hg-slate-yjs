@@ -25,12 +25,22 @@ const textEvent = (event) => {
    * createAddMarkOp(offset: number, length: number, attributes: Object<string, string>): MarkOperation
    */
   const createAddMarkOp = (offset, length, attributes) => {
+    // It appears that (a) an 'add_mark' op can only contain a single mark and
+    // (b) that 'retain' elements in Yjs TextEvents are aligned with this; log
+    // an error if that is not the case. (If we do see 'retain' elements that
+    // yield multiple marks, we probably need to change things such that this
+    // code can return multiple ops, one per mark.)
+    const marks = toSlateMarks(attributes);
+    if (marks.length > 1) {
+      console.error(`Attributes yield more than one mark: ${attributes}`);
+    }
+
     return {
       type: 'add_mark',
       path: eventTargetPath,
       offset,
       length,
-      mark: toSlateMarks(attributes)[0],
+      mark: marks[0],
     };
   };
 
