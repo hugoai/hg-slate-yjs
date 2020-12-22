@@ -208,6 +208,16 @@ const tests = [
 
 const nodeToJSON = (node) => node.toJSON();
 
+// Returns slate document as JSON.
+const getSlateDocAsJSON = (editor) => {
+  return editor.slateDoc.document.nodes.toArray().map(nodeToJSON);
+};
+
+// Returns sync document converted to slate format as JSON.
+const getSyncDocAsJSON = (editor) => {
+  return toSlateDoc(editor.syncDoc.get('document')).map(nodeToJSON);
+};
+
 const runOneTest = async (ti, tj) => {
   // Create two editors.
   const ei = TestEditor.create();
@@ -222,10 +232,8 @@ const runOneTest = async (ti, tj) => {
   TestEditor.applyYjsUpdatesToYjs(ej, updates);
 
   // Verify initial 'document' states.
-  expect(ei.slateDoc.document.nodes.toArray().map(nodeToJSON))
-    .toEqual(ej.slateDoc.document.nodes.toArray().map(nodeToJSON));
-  expect(toSlateDoc(ei.syncDoc.get('document')).map(nodeToJSON))
-    .toEqual(toSlateDoc(ej.syncDoc.get('document')).map(nodeToJSON));
+  expect(getSlateDocAsJSON(ei)).toEqual(getSlateDocAsJSON(ej));
+  expect(getSyncDocAsJSON(ei)).toEqual(getSyncDocAsJSON(ej));
 
   // Verify initial 'data' states.
   expect(ei.slateDoc.data.toJSON())
@@ -246,10 +254,8 @@ const runOneTest = async (ti, tj) => {
   TestEditor.applyYjsUpdatesToYjs(ej, updatesFromI);
 
   // Verify final 'document' states.
-  expect(toSlateDoc(ei.syncDoc.get('document')).map(nodeToJSON))
-    .toEqual(toSlateDoc(ej.syncDoc.get('document')).map(nodeToJSON));
-  expect(ei.slateDoc.document.nodes.toArray().map(nodeToJSON))
-    .toEqual(ej.slateDoc.document.nodes.toArray().map(nodeToJSON));
+  expect(getSyncDocAsJSON(ei)).toEqual(getSyncDocAsJSON(ej));
+  expect(getSlateDocAsJSON(ei)).toEqual(getSlateDocAsJSON(ej));
 
   // Verify final 'data' states.
   expect(ei.syncDoc.get('data').toJSON())

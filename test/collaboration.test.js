@@ -358,6 +358,16 @@ const tests = [
 
 const nodeToJSON = (node) => node.toJSON();
 
+// Returns slate document as JSON.
+const getSlateDocAsJSON = (editor) => {
+  return editor.slateDoc.document.nodes.toArray().map(nodeToJSON);
+};
+
+// Returns sync document converted to slate format as JSON.
+const getSyncDocAsJSON = (editor) => {
+  return toSlateDoc(editor.syncDoc.get('document')).map(nodeToJSON);
+};
+
 describe('slate operations propagate between editors', () => {
   tests.forEach(([testName, input, ...rest]) => {
     it(`${testName}`, () => {
@@ -376,10 +386,10 @@ describe('slate operations propagate between editors', () => {
 
       // Verify initial states.
       const inputAsJSON = input.map(nodeToJSON);
-      expect(src.slateDoc.document.nodes.toArray().map(nodeToJSON)).toStrictEqual(inputAsJSON);
-      expect(toSlateDoc(src.syncDoc.get('document')).map(nodeToJSON)).toStrictEqual(inputAsJSON);
-      expect(toSlateDoc(dst.syncDoc.get('document')).map(nodeToJSON)).toStrictEqual(inputAsJSON);
-      expect(dst.slateDoc.document.nodes.toArray().map(nodeToJSON)).toStrictEqual(inputAsJSON);
+      expect(getSlateDocAsJSON(src)).toStrictEqual(inputAsJSON);
+      expect(getSyncDocAsJSON(src)).toStrictEqual(inputAsJSON);
+      expect(getSyncDocAsJSON(dst)).toStrictEqual(inputAsJSON);
+      expect(getSlateDocAsJSON(dst)).toStrictEqual(inputAsJSON);
 
       // Allow for multiple rounds of applying transforms and verifying state.
       while (rest.length > 0) {
@@ -393,10 +403,10 @@ describe('slate operations propagate between editors', () => {
 
         // Verify final 'document' states.
         const outputAsJSON = output.map(nodeToJSON);
-        expect(src.slateDoc.document.nodes.toArray().map(nodeToJSON)).toStrictEqual(outputAsJSON);
-        expect(toSlateDoc(src.syncDoc.get('document')).map(nodeToJSON)).toStrictEqual(outputAsJSON);
-        expect(toSlateDoc(dst.syncDoc.get('document')).map(nodeToJSON)).toStrictEqual(outputAsJSON);
-        expect(dst.slateDoc.document.nodes.toArray().map(nodeToJSON)).toStrictEqual(outputAsJSON);
+        expect(getSlateDocAsJSON(src)).toStrictEqual(outputAsJSON);
+        expect(getSyncDocAsJSON(src)).toStrictEqual(outputAsJSON);
+        expect(getSyncDocAsJSON(dst)).toStrictEqual(outputAsJSON);
+        expect(getSlateDocAsJSON(dst)).toStrictEqual(outputAsJSON);
 
         // Verify final 'data' states.
         expect(dst.syncDoc.get('data').toJSON()).toStrictEqual(src.syncDoc.get('data').toJSON());
