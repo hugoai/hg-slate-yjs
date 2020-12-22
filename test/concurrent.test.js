@@ -93,12 +93,6 @@ const tests = [
     transform: TestEditor.makeMergeNodes([3]),
   },
   {
-    name: 'Add TopLevel data',
-    transform: TestEditor.makeSetValue({createdBy:{
-      emailAddress: "danielblank07@gmail.com",
-    }})
-  },
-  {
     name: 'Remove 1st paragraph',
     transform: TestEditor.makeRemoveNodes([0]),
   },
@@ -170,15 +164,21 @@ const tests = [
     name: 'Add formatting to 2nd paragraph',
     transform: TestEditor.makeAddMark([1, 0], 2, 11, 'em'),
   },
-  // Temporarily comment out the following, as they are causing test failures. 
-  //  {
-  //    name: 'Add formatting to 3rd paragraph',
-  //    transform: TestEditor.makeAddMark([2, 0], 3, 6, 'underline'),
-  //  },
+  {
+    name: 'Add formatting to 3rd paragraph',
+    transform: TestEditor.makeAddMark([2, 0], 3, 6, 'underline'),
+  },
+  // Temporarily comment out the following, as it is causing test failures.
   //  {
   //    name: 'Add formatting to 4th paragraph',
   //    transform: TestEditor.makeAddMark([3, 0], 4, 2, 'strong'),
   //  },
+  {
+    name: 'Add TopLevel data',
+    transform: TestEditor.makeSetValue({createdBy:{
+      emailAddress: "danielblank07@gmail.com",
+    }})
+  },
   {
     name: 'Update the TopLevel Data 1',
     transform: TestEditor.makeSetValue({createdBy:{
