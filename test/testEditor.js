@@ -224,12 +224,24 @@ const TestEditor = {
       e.slateDoc = change.value;
     };
   },
+
   /**
    * makeSetValue(Properties: Properties): TransformFunc
    */
   makeSetValue(properties) {
     return (e) => {
       const change = e.slateDoc.change().setValue({data: properties})
+      TestEditor.applySlateOpsToYjs(e, change.operations);
+      e.slateDoc = change.value;
+    };
+  },
+
+  /**
+   * makeAddMark(path: Path, offset: number, length: number, markType: string): TransformFunc
+   */
+  makeAddMark(path, offset, length, markType) {
+    return (e) => {
+      const change = e.slateDoc.change().addMarkByPath(path, offset, length, { type: markType });
       TestEditor.applySlateOpsToYjs(e, change.operations);
       e.slateDoc = change.value;
     };

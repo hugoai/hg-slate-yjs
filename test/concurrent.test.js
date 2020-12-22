@@ -123,14 +123,6 @@ const tests = [
     transform: TestEditor.makeRemoveNodes([1, 0]),
   },
   {
-    name: 'Update the TopLevel Data 1',
-    transform: TestEditor.makeSetValue({createdBy:{
-      emailAddress: "danielblank07@gmail.com",
-      id: "ac8e5fe7-af4e-4281-b1e2-53630606e7c6",
-    }})
-  },
-  
-  {
     name: 'Remove text node from 3nd paragraph',
     transform: TestEditor.makeRemoveNodes([2, 0]),
   },
@@ -155,20 +147,51 @@ const tests = [
     transform: TestEditor.makeSplitNodes({ path: [3, 0], offset: 7}),
   },
   {
-    name: 'Update the TopLevel Data 2',
-    transform: TestEditor.makeSetValue({createdBy:{
-      emailAddress: "danielblank07@gmail.com",
-      id: "ac8e5fe7-af4e-4281-b1e2-53630606e7c6",
-      name: "Daniel Blank",
-    }})
-  },
-  {
     name: 'Move 1st paragraph',
     transform: TestEditor.makeMoveNodes([0], [3]),
   },
   {
     name: 'Move 2nd paragraph',
     transform: TestEditor.makeMoveNodes([3], [2]),
+  },
+  {
+    name: 'Move 3rd paragraph',
+    transform: TestEditor.makeMoveNodes([2], [1]),
+  },
+  {
+    name: 'Move 4th paragraph',
+    transform: TestEditor.makeMoveNodes([1], [0]),
+  },
+  {
+    name: 'Add formatting to 1st paragraph',
+    transform: TestEditor.makeAddMark([0, 0], 1, 9, 'strong'),
+  },
+  {
+    name: 'Add formatting to 2nd paragraph',
+    transform: TestEditor.makeAddMark([1, 0], 2, 11, 'em'),
+  },
+  {
+    name: 'Add formatting to 3rd paragraph',
+    transform: TestEditor.makeAddMark([2, 0], 3, 6, 'underline'),
+  },
+  {
+    name: 'Add formatting to 4th paragraph',
+    transform: TestEditor.makeAddMark([3, 0], 4, 2, 'strong'),
+  },
+  {
+    name: 'Update the TopLevel Data 1',
+    transform: TestEditor.makeSetValue({createdBy:{
+      emailAddress: "danielblank07@gmail.com",
+      id: "ac8e5fe7-af4e-4281-b1e2-53630606e7c6",
+    }})
+  },
+  {
+    name: 'Update the TopLevel Data 2',
+    transform: TestEditor.makeSetValue({createdBy:{
+      emailAddress: "danielblank07@gmail.com",
+      id: "ac8e5fe7-af4e-4281-b1e2-53630606e7c6",
+      name: "Daniel Blank",
+    }})
   },
   {
     name: 'Update the TopLevel Data 3',
@@ -179,14 +202,6 @@ const tests = [
       pictureUrl: "https://lh4.googleusercontent.com/-Au4KLfih-zQ/AAAAAAAAAAI/AAAAAAAAAAA/ACHi3rcJjTL-m5CILVsClpS2Om3OQycCcQ/photo.jpg",
       teamId: "8d930c14-9116-4984-b5c8-cdee9432ae87"
     }})
-  },
-  {
-    name: 'Move 3rd paragraph',
-    transform: TestEditor.makeMoveNodes([2], [1]),
-  },
-  {
-    name: 'Move 4th paragraph',
-    transform: TestEditor.makeMoveNodes([1], [0]),
   },
 ];
 
@@ -205,12 +220,16 @@ const runOneTest = async (ti, tj) => {
   const updates = TestEditor.getCapturedYjsUpdates(ei);
   TestEditor.applyYjsUpdatesToYjs(ej, updates);
 
-  // Verify initial states match.
+  // Verify initial 'document' states.
   expect(ei.slateDoc.document.nodes.toArray().map(nodeToJSON))
     .toEqual(ej.slateDoc.document.nodes.toArray().map(nodeToJSON));
   expect(toSlateDoc(ei.syncDoc.get('document')).map(nodeToJSON))
     .toEqual(toSlateDoc(ej.syncDoc.get('document')).map(nodeToJSON));
-    expect(ei.syncDoc.get('data').toJSON())
+
+  // Verify initial 'data' states.
+  expect(ei.slateDoc.data.toJSON())
+    .toEqual(ej.slateDoc.data.toJSON());
+  expect(ei.syncDoc.get('data').toJSON())
     .toEqual(ej.syncDoc.get('data').toJSON());
 
   // Apply 1st transform to 1st editor, capture updates.
@@ -225,15 +244,17 @@ const runOneTest = async (ti, tj) => {
   TestEditor.applyYjsUpdatesToYjs(ei, updatesFromJ);
   TestEditor.applyYjsUpdatesToYjs(ej, updatesFromI);
 
-  // Verify final states match.
-  expect(ei.slateDoc.document.nodes.toArray().map(nodeToJSON))
-    .toEqual(ej.slateDoc.document.nodes.toArray().map(nodeToJSON));
+  // Verify final 'document' states.
   expect(toSlateDoc(ei.syncDoc.get('document')).map(nodeToJSON))
     .toEqual(toSlateDoc(ej.syncDoc.get('document')).map(nodeToJSON));
-  expect(ei.slateDoc.data.toJSON())
-    .toEqual(ej.slateDoc.data.toJSON());
+  expect(ei.slateDoc.document.nodes.toArray().map(nodeToJSON))
+    .toEqual(ej.slateDoc.document.nodes.toArray().map(nodeToJSON));
+
+  // Verify final 'data' states.
   expect(ei.syncDoc.get('data').toJSON())
     .toEqual(ej.syncDoc.get('data').toJSON());
+  expect(ei.slateDoc.data.toJSON())
+    .toEqual(ej.slateDoc.data.toJSON());
 }
 
 describe('model concurrent edits in separate editors', () => {

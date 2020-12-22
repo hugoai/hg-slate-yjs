@@ -1,6 +1,7 @@
 const { TestEditor } = require('./testEditor');
 const { toSlateDoc } = require('../src');
 const { createLine, createText } = require('./utils');
+const { Text } = require('slate');
 const Y = require('yjs');
 
 const tests = [
@@ -325,6 +326,34 @@ const tests = [
     ],
     [createLine([createText('')])],
   ],
+  [
+    'Add marks to existing text',
+    [
+      createLine([createText('alfa bravo charlie')]),
+    ],
+    [
+      TestEditor.makeAddMark([0, 0], 0, 4, 'underline'),
+    ],
+    [
+      createLine([
+        Text.create({ leaves: [
+          { text: 'alfa', marks: [{ type: 'underline' }]},
+          { text: ' bravo charlie' }
+        ]})]),
+    ],
+    [
+      TestEditor.makeAddMark([0, 0], 5, 5, 'strong'),
+    ],
+    [
+      createLine([
+        Text.create({ leaves: [
+          { text: 'alfa', marks: [{ type: 'underline' }]},
+          { text: ' ' },
+          { text: 'bravo', marks: [{ type: 'strong' }]},
+          { text: ' charlie' }
+        ]})]),
+    ],
+  ],
 ];
 
 const nodeToJSON = (node) => node.toJSON();
@@ -362,15 +391,16 @@ describe('slate operations propagate between editors', () => {
         updates = TestEditor.getCapturedYjsUpdates(src);
         TestEditor.applyYjsUpdatesToYjs(dst, updates);
 
-        // Verify final states.
+        // Verify final 'document' states.
         const outputAsJSON = output.map(nodeToJSON);
         expect(src.slateDoc.document.nodes.toArray().map(nodeToJSON)).toStrictEqual(outputAsJSON);
         expect(toSlateDoc(src.syncDoc.get('document')).map(nodeToJSON)).toStrictEqual(outputAsJSON);
         expect(toSlateDoc(dst.syncDoc.get('document')).map(nodeToJSON)).toStrictEqual(outputAsJSON);
-        expect(dst.syncDoc.get('data').toJSON()).toStrictEqual(src.syncDoc.get('data').toJSON());
         expect(dst.slateDoc.document.nodes.toArray().map(nodeToJSON)).toStrictEqual(outputAsJSON);
-        expect(src.slateDoc.data.toJSON()).toStrictEqual(dst.slateDoc.data.toJSON());
 
+        // Verify final 'data' states.
+        expect(dst.syncDoc.get('data').toJSON()).toStrictEqual(src.syncDoc.get('data').toJSON());
+        expect(src.slateDoc.data.toJSON()).toStrictEqual(dst.slateDoc.data.toJSON());
       }
     });
   });

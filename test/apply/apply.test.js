@@ -1,7 +1,7 @@
 const { applySlateOp, applySlateOps, toSlateDoc} = require('../../src');
 const { createLine, createDoc, createText, createSlateValue } = require('../utils');
 const { List } = require('immutable');
-const { Operation } = require('slate');
+const { Operation, Text } = require('slate');
 const Y = require("yjs")
 
 const transforms = [
@@ -210,6 +210,38 @@ const transforms = [
       createLine([createText('Hello ')]),
       createLine([createText('collaborator!')])
     ]
+  ],
+  [
+    'add_mark',
+    [
+      createLine([createText('hotel uniform golf oscar')])
+    ],
+    [
+      {
+        path: [0, 0],
+        offset: 6,
+        length: 12,
+        mark: { type: 'strong' },
+        type: 'add_mark'
+      },
+      {
+        path: [0, 0],
+        offset: 0,
+        length: 13,
+        mark: { type: 'em' },
+        type: 'add_mark'
+      }
+    ],
+    [
+      createLine([Text.create({
+        leaves: [
+          { text: 'hotel ', marks: [{ type: 'em' }]},
+          { text: 'uniform', marks: [{ type: 'em' }, { type: 'strong' }]},
+          { text: ' golf', marks: [{ type: 'strong' }]},
+          { text: ' oscar' },
+        ],
+      })])
+    ],
   ]
 ];
 

@@ -162,6 +162,8 @@ const toSlatePath = (path) => {
 };
 
 module.exports = {
+  toFormattingAttributes,
+  toSlateMarks,
   toSlateNode,
   toSlateDoc,
   toSyncDoc,
