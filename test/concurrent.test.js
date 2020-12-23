@@ -234,6 +234,7 @@ const runOneTest = async (ti, tj) => {
   // Verify initial 'document' states.
   expect(getSlateDocAsJSON(ei)).toEqual(getSlateDocAsJSON(ej));
   expect(getSyncDocAsJSON(ei)).toEqual(getSyncDocAsJSON(ej));
+  expect(Y.encodeStateAsUpdate(ei.doc)).toEqual(Y.encodeStateAsUpdate(ej.doc));
 
   // Verify initial 'data' states.
   expect(ei.slateDoc.data.toJSON())
@@ -254,6 +255,7 @@ const runOneTest = async (ti, tj) => {
   TestEditor.applyYjsUpdatesToYjs(ej, updatesFromI);
 
   // Verify final 'document' states.
+  expect(Y.encodeStateAsUpdate(ei.doc)).toEqual(Y.encodeStateAsUpdate(ej.doc));
   expect(getSyncDocAsJSON(ei)).toEqual(getSyncDocAsJSON(ej));
   expect(getSlateDocAsJSON(ei)).toEqual(getSlateDocAsJSON(ej));
 
