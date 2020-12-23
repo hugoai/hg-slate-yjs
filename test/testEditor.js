@@ -246,6 +246,17 @@ const TestEditor = {
       e.slateDoc = change.value;
     };
   },
+
+  /**
+   * makeRemoveMark(path: Path, offset: number, length: number, markType: string): TransformFunc
+   */
+  makeRemoveMark(path, offset, length, markType) {
+    return (e) => {
+      const change = e.slateDoc.change().removeMarkByPath(path, offset, length, { type: markType });
+      TestEditor.applySlateOpsToYjs(e, change.operations);
+      e.slateDoc = change.value;
+    };
+  },
 };
 
 module.exports = { TestEditor };

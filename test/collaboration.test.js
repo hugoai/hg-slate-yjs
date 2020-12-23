@@ -354,6 +354,42 @@ const tests = [
         ]})]),
     ],
   ],
+  [
+    'Remove marks from existing text',
+    [
+      createLine([
+        Text.create({ leaves: [
+          { text: 'alfa ', marks: [{ type: 'strong' }]},
+          { text: 'bravo charlie', marks: [{ type: 'em' }]},
+          { text: ' delta' }
+        ]})]),
+    ],
+    [
+      TestEditor.makeRemoveMark([0, 0], 1, 4, 'strong'),
+    ],
+    [
+      createLine([
+        Text.create({ leaves: [
+          { text: 'a', marks: [{ type: 'strong' }]},
+          { text: 'lfa ' },
+          { text: 'bravo charlie', marks: [{ type: 'em' }]},
+          { text: ' delta' }
+        ]})]),
+    ],
+    [
+      TestEditor.makeRemoveMark([0, 0], 7, 11, 'em'),
+    ],
+    [
+      createLine([
+        Text.create({ leaves: [
+          { text: 'a', marks: [{ type: 'strong' }]},
+          { text: 'lfa ' },
+          { text: 'br', marks: [{ type: 'em' }]},
+          { text: 'avo charlie' },
+          { text: ' delta' }
+        ]})]),
+    ],
+  ],
 ];
 
 const nodeToJSON = (node) => node.toJSON();

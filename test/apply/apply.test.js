@@ -242,6 +242,38 @@ const transforms = [
         ],
       })])
     ],
+  ],
+  [
+    'remove_mark',
+    [
+      createLine([Text.create({
+        leaves: [
+          { text: 'hotel ', marks: [{ type: 'em' }]},
+          { text: 'uniform', marks: [{ type: 'em' }, { type: 'strong' }]},
+          { text: ' golf', marks: [{ type: 'strong' }]},
+          { text: ' oscar' },
+        ],
+      })])
+    ],
+    [
+      {
+        path: [0, 0],
+        offset: 0,
+        length: 13,
+        mark: { type: 'em' },
+        type: 'remove_mark'
+      },
+      {
+        path: [0, 0],
+        offset: 6,
+        length: 12,
+        mark: { type: 'strong' },
+        type: 'remove_mark'
+      },
+    ],
+    [
+      createLine([createText('hotel uniform golf oscar')])
+    ],
   ]
 ];
 
