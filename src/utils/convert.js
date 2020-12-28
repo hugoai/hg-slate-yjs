@@ -142,12 +142,19 @@ const toSyncElement = (node) => {
 /**
  * Converts a List of slate Marks to Yjs formatting attributes
  *
- * toFormattingAttributes(List<Mark>): Object<string, string>
+ * toFormattingAttributes(List<Mark>, boolean): Object<string, string>
  */
-const toFormattingAttributes = (marks) => {
+const toFormattingAttributes = (marks, setMark = true) => {
   const result = {};
   marks.forEach(mark => {
-    result[mark.type] = 'true';
+    // If setMark is false, use a value of null to indicate that application of
+    // the resulting formatting attributes should cause the mark to be cleared.
+    //
+    // TBD: Perhaps use true (boolean) instead of 'true' (string) here?
+    // Currently using 'true' because the Yjs API documentation suggests that
+    // the formatting attributes should be Object<string, string>, though the
+    // provided example seems to show Object<string, boolean> instead ...
+    result[mark.type] = setMark ? 'true' : null;
   })
   return result;
 };
