@@ -168,11 +168,10 @@ const tests = [
     name: 'Add formatting to 3rd paragraph',
     transform: TestEditor.makeAddMark([2, 0], 3, 6, 'underline'),
   },
-  // Temporarily comment out the following, as it is causing test failures.
-  //  {
-  //    name: 'Add formatting to 4th paragraph',
-  //    transform: TestEditor.makeAddMark([3, 0], 4, 2, 'strong'),
-  //  },
+  {
+    name: 'Add formatting to 4th paragraph',
+    transform: TestEditor.makeAddMark([3, 0], 4, 2, 'strong'),
+  },
   {
     name: 'Add TopLevel data',
     transform: TestEditor.makeSetValue({createdBy:{
@@ -243,17 +242,25 @@ const runOneTest = async (ti, tj) => {
   expect(ei.syncDoc.get('data').toJSON())
     .toEqual(ej.syncDoc.get('data').toJSON());
 
-  // Apply 1st transform to 1st editor, capture updates.
+  // Apply 1st transform to 1st editor.
   TestEditor.applyTransform(ei, ti.transform);
-  const updatesFromI = TestEditor.getCapturedYjsUpdates(ei);
 
-  // Apply 2nd transform to 2nd editor, capture updates.
+  // Apply 2nd transform to 2nd editor.
   TestEditor.applyTransform(ej, tj.transform);
-  const updatesFromJ = TestEditor.getCapturedYjsUpdates(ej);
 
-  // Cross-propagate updates between editors.
-  TestEditor.applyYjsUpdatesToYjs(ei, updatesFromJ);
-  TestEditor.applyYjsUpdatesToYjs(ej, updatesFromI);
+  // Cross-propagate updates between editors (using a loop, as it is possible
+  // that applying one update will cause another update to be generated -- see
+  // https://discuss.yjs.dev/t/yjs-state-diverging-trying-to-figure-out-why/329).
+  while (true) {
+    const updatesFromI = TestEditor.getCapturedYjsUpdates(ei);
+    const updatesFromJ = TestEditor.getCapturedYjsUpdates(ej);
+    if (updatesFromI.length == 0 && updatesFromJ.length == 0) {
+      break;
+    }
+
+    TestEditor.applyYjsUpdatesToYjs(ei, updatesFromJ);
+    TestEditor.applyYjsUpdatesToYjs(ej, updatesFromI);
+  }
 
   // Verify final 'document' states.
   expect(Y.encodeStateVector(ei.doc)).toEqual(Y.encodeStateVector(ej.doc));
