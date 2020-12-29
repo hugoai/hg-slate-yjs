@@ -26,30 +26,19 @@ const textEvent = (event) => {
   };
 
   /**
-   * createMarkOp(
+   * createMarkOps(
    *   offset: number, 
    *   length: number, 
-   *   attributes: Object<string, string>): MarkOperation
+   *   attributes: Object<string, string>): MarkOperation[]
    */
-  const createMarkOp = (offset, length, attributes) => {
-    // It appears that (a) an 'add_mark' or 'remove_mark' op can only contain a
-    // single mark and (b) that 'retain' elements in Yjs TextEvents are aligned
-    // with this; log an error if that is not the case. (If we do see 'retain'
-    // elements that yield multiple marks, we probably need to change things
-    // such that this code can return multiple ops, one per mark.)
-    const marks = toSlateMarks(attributes);
-    if (marks.length > 1) {
-      console.error(`Attributes yield more than one mark: ${attributes}`);
-    }
-    const mark = marks[0];
-
-    return {
+  const createMarkOps = (offset, length, attributes) => {
+    return toSlateMarks(attributes).map(mark => ({
       type: ((attributes[mark.type] !== null) ? 'add_mark' : 'remove_mark'),
       path: eventTargetPath,
       offset,
       length,
       mark,
-    };
+    }));
   };
 
   const removedValues = event.changes.deleted.values();
@@ -62,7 +51,8 @@ const textEvent = (event) => {
     const d = delta;
     if (d.retain !== undefined) {
       if (!!d.attributes) {
-        markOps.push(createMarkOp(addOffset, d.retain, d.attributes));
+        createMarkOps(addOffset, d.retain, d.attributes).forEach(
+          markOp => { markOps.push(markOp); });
       }
       removeOffset += d.retain;
       addOffset += d.retain;
@@ -71,10 +61,12 @@ const textEvent = (event) => {
       while (text.length < d.delete) {
         const item = removedValues.next().value;
         const { content } = item;
-        if (!(content && content.constructor.name === "ContentString")) {
-          throw new TypeError(`Unsupported content type ${item.content}`);
+
+        // Skip deleted items that don't contain text (e.g., some only contain
+        // formatting attributes).
+        if (content && content.constructor.name === "ContentString") {
+          text = text.concat(content.str);
         }
-        text = text.concat(content.str);
       }
       if (text.length !== d.delete) {
         throw new Error(

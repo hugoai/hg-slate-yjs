@@ -1,13 +1,21 @@
 const { TestEditor } = require('./testEditor');
 const { toSlateDoc } = require('../src');
 const { createLine, createText } = require('./utils');
-
+const { Text } = require('slate');
 const Y = require('yjs');
 
 const initialState = [
-  createLine([createText('alfa bravo')]),
+  createLine([
+    Text.create({ leaves: [
+      { text: 'alfa brav' },
+      { text: 'o', marks: [{ type: 'em' }]}]})
+  ]),
   createLine([createText('charlie delta')]),
-  createLine([createText('echo foxtrot')]),
+  createLine([
+    Text.create({ leaves: [
+      { text: 'ech', marks: [{ type: 'strong' }]},
+      { text: 'o foxtrot' }]})
+  ]),
   createLine([createText('golf hotel')]),
 ];
 
@@ -171,6 +179,14 @@ const tests = [
   {
     name: 'Add formatting to 4th paragraph',
     transform: TestEditor.makeAddMark([3, 0], 4, 2, 'strong'),
+  },
+  {
+    name: 'Remove formatting from 1st paragraph',
+    transform: TestEditor.makeRemoveMark([0, 0], 9, 1, 'em'),
+  },
+  {
+    name: 'Remove formatting from 3rd paragraph',
+    transform: TestEditor.makeRemoveMark([2, 0], 0, 3, 'strong'),
   },
   {
     name: 'Add TopLevel data',

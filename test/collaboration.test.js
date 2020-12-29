@@ -83,24 +83,54 @@ const tests = [
   [
     'Merge two paragraph nodes',
     [
-      createLine([createText('Hello ')]),
-      createLine([createText('collaborator!')]),
+      createLine([
+        Text.create({ leaves: [
+          { text: 'Hello', marks: [{ type: 'strong' }]},
+          { text: ' ' },
+        ]})
+      ]),
+      createLine([
+        Text.create({ leaves: [
+          { text: 'collaborator!', marks: [{ type: 'em' }]},
+        ]})
+      ]),
     ],
     [TestEditor.makeMergeNodes([1])],
-    [createLine([createText('Hello collaborator!')])],
+    [
+      createLine([
+        Text.create({ leaves: [
+          { text: 'Hello', marks: [{ type: 'strong' }]},
+          { text: ' ' },
+          { text: 'collaborator!', marks: [{ type: 'em' }]}
+        ]})
+      ]),
+    ],
   ],
   [
+    // Also verifies that marks are preserved when moving nodes.
     'Move a paragraph node to an existing position',
     [
-      createLine([createText('first')]),
-      createLine([createText('second')]),
-      createLine([createText('third')]),
+      createLine([
+        Text.create({ leaves: [{ text: 'first', marks: [{ type: 'em' }]}]})
+      ]),
+      createLine([
+        Text.create({ leaves: [{ text: 'second', marks: [{ type: 'strong' }]}]})
+      ]),
+      createLine([
+        Text.create({ leaves: [{ text: 'third', marks: [{ type: 'underline' }]}]})
+      ]),
     ],
     [TestEditor.makeMoveNodes([1], [0])],
     [
-      createLine([createText('second')]),
-      createLine([createText('first')]),
-      createLine([createText('third')]),
+      createLine([
+        Text.create({ leaves: [{ text: 'second', marks: [{ type: 'strong' }]}]})
+      ]),
+      createLine([
+        Text.create({ leaves: [{ text: 'first', marks: [{ type: 'em' }]}]})
+      ]),
+      createLine([
+        Text.create({ leaves: [{ text: 'third', marks: [{ type: 'underline' }]}]})
+      ]),
     ],
   ],
   [
