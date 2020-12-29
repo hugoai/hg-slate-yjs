@@ -223,9 +223,31 @@ const tests = [
 
 const nodeToJSON = (node) => node.toJSON();
 
+// Recursively walk JSON representation of slate doc, reordering leaf marks
+// (when present) into canonical order (sorted by mark type).
+const fixMarkOrder = (node) => {
+  for (const key in node) {
+    if (key === 'nodes' && node['object'] === 'block') {
+      node[key] = node[key].map(fixMarkOrder);
+    } else if (key === 'leaves' && node['object'] === 'text') {
+      node[key] = node[key].map(fixMarkOrder);
+    } else if (key === 'marks' && node['object'] === 'leaf') {
+      node[key] = node[key].map(fixMarkOrder).sort((a, b) => {
+        if (a.type < b.type) {
+          return -1;
+        } else if (a.type > b.type) {
+          return 1;
+        }
+        return 0;
+      });
+    }
+  }
+  return node;
+};
+
 // Returns slate document as JSON.
 const getSlateDocAsJSON = (editor) => {
-  return editor.slateDoc.document.nodes.toArray().map(nodeToJSON);
+  return editor.slateDoc.document.nodes.toArray().map(nodeToJSON).map(fixMarkOrder);
 };
 
 // Returns sync document converted to slate format as JSON.
