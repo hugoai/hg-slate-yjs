@@ -13,6 +13,19 @@ const cloneSyncElement = (element) => {
   if (text !== undefined) {
     const textElement = new Y.Text(text.toString());
     clone.set('text', textElement);
+    let index = 0;
+    text.toDelta().forEach(d => {
+      if (!d.insert) {
+        // We expect the delta representation to only contain 'insert' elements.
+        throw new Error(`Unexpected delta element: ${d}`);
+      }
+      if (!!d.attributes) {
+        // If the current element contains formatting attributes, apply them to
+        // the cloned text.
+        textElement.format(index, d.insert.length, d.attributes);
+      }
+      index += d.insert.length;
+    });
   }
 
   if (children !== undefined) {
