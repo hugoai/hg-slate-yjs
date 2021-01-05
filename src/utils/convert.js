@@ -1,5 +1,4 @@
 const { Block, Document, Inline, Leaf, Mark, Text, Value } = require('slate');
-const isPlainObject = require('is-plain-object');
 const Y = require('yjs');
 const { SyncElement } = require('../model');
 const { Set } = require('immutable');
