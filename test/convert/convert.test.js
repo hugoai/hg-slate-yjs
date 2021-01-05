@@ -1,58 +1,53 @@
-const { Text } = require('slate');
-const { toSlateDoc, toSyncDoc } = require('../../src');
-const { createLine, createMention, createText } = require('../utils');
-const Y = require('yjs');
+const { Value, Text } = require("slate");
+const { toSlateDoc, toSyncDoc } = require("../../src");
+const { createLine, createMention, createText } = require("../utils");
+const Y = require("yjs");
 
 const tests = [
   [
-    'text node',
-    createText('abc')
-  ],
-  [
-    'inline node',
-    createMention([createText('@def')])
-  ],
-  [
-    'block node',
+    "block node with inline",
     createLine([
-      createText('ghi'), 
-      createMention([createText('@jkl')])
-    ])
+      createText("ghi"),
+      createMention([createText("@jkl")]),
+      createText(""),
+    ]),
   ],
   [
-    'block node with properties',
-    createLine([createText('mno')], { pqr: 'stu' })
+    "block node with properties",
+    createLine([createText("mno")], { pqr: "stu" }),
   ],
   [
-    'text with marks',
-    Text.create({
-      leaves: [
-        { text: 'ab' },
-        {
-          text: 'cde',
-          marks: [{ type: 'strong' }]
-        },
-        {
-          text: 'fghi',
-          marks: [{ type: 'em' }, { type: 'underline' }]
-        },
-        { text: 'jklmn' },
-      ],
-    })
+    "text with marks",
+    createLine([
+      Text.create({
+        leaves: [
+          { text: "ab" },
+          {
+            text: "cde",
+            marks: [{ type: "strong" }],
+          },
+          {
+            text: "fghi",
+            marks: [{ type: "em" }, { type: "underline" }],
+          },
+          { text: "jklmn" },
+        ],
+      }),
+    ]),
   ],
 ];
 
 const nodeToJS = (node) => node.toJS();
 
-describe('convert', () => {
+describe("convert", () => {
   tests.forEach(([testName, input]) => {
     it(`${testName}`, () => {
       const doc = new Y.Doc();
-      const syncArray = doc.getArray('document');
+      const syncDoc = doc.getMap("content");
 
-      toSyncDoc(syncArray, [input]);
-      const output = toSlateDoc(syncArray);
-      expect(output.map(nodeToJS)).toStrictEqual([nodeToJS(input)]);
+      toSyncDoc(syncDoc, Value.create({ document: { nodes: [input] } }));
+      const output = toSlateDoc(syncDoc);
+      expect(output.document.nodes.toJS()).toStrictEqual([nodeToJS(input)]);
     });
   });
 });

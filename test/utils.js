@@ -1,11 +1,11 @@
-const { Block, Inline, Text, Value } = require('slate');
-const Y = require('yjs');
-const { toSyncDoc } = require('../src');
+const { Block, Inline, Text, Value } = require("slate");
+const Y = require("yjs");
+const { toSyncDoc } = require("../src");
 
 const createLine = (children, properties = {}) => {
   return Block.fromJSON({
-    object: 'block',
-    type: 'line',
+    object: "block",
+    type: "line",
     data: properties,
     nodes: children,
   });
@@ -13,44 +13,43 @@ const createLine = (children, properties = {}) => {
 
 const createMention = (children, properties = {}) => {
   return Inline.fromJSON({
-    object: 'inline',
-    type: 'mention',
+    object: "inline",
+    type: "mention",
     data: properties,
     nodes: children,
   });
 };
 
-const createText = (text = '') => {
+const createText = (text = "") => {
   return Text.fromJSON({
-    object: 'text',
+    object: "text",
     leaves: [
       {
-        object: 'leaf',
+        object: "leaf",
         text,
         marks: [],
-      }
+      },
     ],
   });
 };
 
-const createValue = (children) => ({
-  children: children || [createNode()]
-});
-
 const createSlateValue = (properties) => {
-  return Value.create().change().setValue({data:properties}).value.data
-}
+  return Value.create().change().setValue({ data: properties }).value.data;
+};
 
 const createDoc = (children) => {
   const doc = new Y.Doc();
-  const innerDocument = new Y.Array()
+  const innerDocument = doc.getMap("content");
 
-  toSyncDoc(innerDocument, createValue(children).children)
-
-  doc.getMap('content').set('document', innerDocument)
-  doc.getMap('content').set('data', new Y.Map())
+  toSyncDoc(innerDocument, Value.create({ document: { nodes: children } }));
 
   return doc;
 };
 
-module.exports = { createLine, createMention, createText, createDoc, createSlateValue };
+module.exports = {
+  createLine,
+  createMention,
+  createText,
+  createDoc,
+  createSlateValue,
+};

@@ -1,7 +1,6 @@
-const { Path } = require('slate');
-const Y = require('yjs');
-const { SyncDoc, SyncElement, SyncNode } = require('../model');
-const { toSlateDoc } = require('../utils/convert');
+const { Path } = require("slate");
+const Y = require("yjs");
+const { SyncDoc, SyncElement, SyncNode } = require("../model");
 
 /**
  * Returns the SyncNode referenced by the path
@@ -20,9 +19,7 @@ const getTarget = (doc, path) => {
     }
     if (!result) {
       throw new TypeError(
-        `path ${path.toString()} does not match doc ${JSON.stringify(
-          toSlateDoc(doc)
-        )}`
+        `path ${path.toString()} does not match doc ${JSON.stringify(doc)}`
       );
     }
     return result;
@@ -36,7 +33,7 @@ const getTarget = (doc, path) => {
  */
 const getParentPath = (path, level = 1) => {
   if (level > path.size) {
-    throw new TypeError('requested ancestor is higher than root');
+    throw new TypeError("requested ancestor is higher than root");
   }
 
   return [path.get(path.size - level), path.slice(0, path.size - level)];

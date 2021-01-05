@@ -1,16 +1,7 @@
-const { Block, Inline, Leaf, Mark, Text } = require('slate');
-const isPlainObject = require('is-plain-object');
+const { Block, Document, Inline, Leaf, Mark, Text, Value } = require('slate');
 const Y = require('yjs');
 const { SyncElement } = require('../model');
 const { Set } = require('immutable');
-
-/**
- * isElement(value): boolean
- */
-const isElement = (value) => {
-  // object: block | inline
-  return isPlainObject(value) && Array.isArray(value.nodes);
-};
 
 /**
  * Converts a sync element to a slate node
@@ -20,27 +11,27 @@ const isElement = (value) => {
 const toSlateNode = (element) => {
   let attrs = {};
   for (const [key, value] of element.entries()) {
-    if (key !== 'children' && key !== 'text' && key !== 'marks') {
+    if (key !== "children" && key !== "text" && key !== "marks") {
       attrs[key] = value;
     }
   }
 
-  const object = element.get('object');
-  if (object === 'block') {
+  const object = element.get("object");
+  if (object === "block") {
     const children = SyncElement.getChildren(element);
     attrs = {
       nodes: children.map(toSlateNode),
       ...attrs,
     };
     return Block.create(attrs);
-  } else if (object === 'inline') {
+  } else if (object === "inline") {
     const children = SyncElement.getChildren(element);
     attrs = {
       nodes: children.map(toSlateNode),
       ...attrs,
     };
     return Inline.create(attrs);
-  } else if (object === 'text') {
+  } else if (object === "text") {
     const text = SyncElement.getText(element);
     attrs = {
       leaves: text.toDelta().map(toSlateLeaf),
@@ -90,17 +81,24 @@ const toSlateMarks = (attributes) => {
  * toSlateDoc(syncDoc: SyncDoc): Node[]
  */
 const toSlateDoc = (syncDoc) => {
-  return syncDoc.map(toSlateNode);
+  const documentNodes = syncDoc.get("document") || [];
+  const nodes = documentNodes.map(toSlateNode);
+  const document = Document.create({ nodes });
+  const data = syncDoc.get("data");
+  return Value.create({ document, data: data ? data.toJSON() : {} });
 };
 
 /**
  * Converts all elements into a Slate doc to SyncElements and adds them to the
  * SyncDoc
  *
- * toSyncDoc(syncDoc: SyncDoc, doc: Node[]): void
+ * toSyncDoc(syncDoc: SyncDoc, value: Value): void
  */
-const toSyncDoc = (syncDoc, doc) => {
-  syncDoc.insert(0, doc.map(toSyncElement));
+const toSyncDoc = (syncDoc, value) => {
+  const document = new Y.Array();
+  document.insert(0, value.document.nodes.map(toSyncElement));
+  syncDoc.set("document", document);
+  syncDoc.set("data", new Y.Map(value.data));
 };
 
 /**
@@ -115,7 +113,7 @@ const toSyncElement = (node) => {
     const childElements = node.nodes.map(toSyncElement);
     const childContainer = new Y.Array();
     childContainer.insert(0, childElements);
-    element.set('children', childContainer);
+    element.set("children", childContainer);
   }
 
   if (Text.isText(node)) {
@@ -131,7 +129,7 @@ const toSyncElement = (node) => {
   }
 
   for (const [key, value] of Object.entries(node.toJSON())) {
-    if (key !== 'leaves' && key !== 'nodes') {
+    if (key !== "leaves" && key !== "nodes") {
       element.set(key, value);
     }
   }
@@ -165,7 +163,7 @@ const toFormattingAttributes = (marks, setMark = true) => {
  * toSlatePath(path: (string | number)[]): Path
  */
 const toSlatePath = (path) => {
-  return path.filter((node) => typeof node === 'number');
+  return path.filter((node) => typeof node === "number");
 };
 
 module.exports = {
