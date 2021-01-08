@@ -1,5 +1,5 @@
 const { Value, Text } = require("slate");
-const { toSlateDoc, toSyncDoc } = require("../../src");
+const { toSlateDoc, toSyncDoc, toSlateOps } = require("../../src");
 const { createLine, createMention, createText } = require("../utils");
 const Y = require("yjs");
 
@@ -49,5 +49,43 @@ describe("convert", () => {
       const output = toSlateDoc(syncDoc);
       expect(output.document.nodes.toJS()).toStrictEqual([nodeToJS(input)]);
     });
+  });
+
+  it("should convert YMap events to insert_node Slate operations", () => {
+    const doc = new Y.Doc();
+    const syncDoc = doc.getMap("content");
+    let operations = [];
+    syncDoc.observeDeep((events) => {
+      const ops = toSlateOps(events);
+      operations = operations.concat(ops);
+    });
+    const value = Value.create({
+      document: { nodes: [createLine([createText("mno")])] },
+    });
+    toSyncDoc(syncDoc, value);
+    expect(operations).toHaveLength(2);
+    expect(operations[0]).toEqual(
+      {
+        type: "insert_node",
+        node: {
+          object: "block",
+          type: "line",
+          data: {},
+          nodes: [
+            {
+              object: "text",
+              leaves: [{ text: "mno", marks: [], object: "leaf" }],
+            },
+          ],
+        },
+        path: [0],
+      },
+      {
+        type: "set_value",
+        properties: { data: {} },
+        newProperties: {},
+        path: [],
+      }
+    );
   });
 });
