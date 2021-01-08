@@ -51,7 +51,7 @@ describe("convert", () => {
     });
   });
 
-  it("should convert YMap events to insert_node Slate operations", () => {
+  it("should create insert_node Slate operations when creating a document", () => {
     const doc = new Y.Doc();
     const syncDoc = doc.getMap("content");
     let operations = [];
