@@ -2,18 +2,29 @@ const Y = require("yjs");
 const { Block } = require("slate");
 const { toSlatePath } = require("../utils/convert");
 
+/**
+ * Extracts insert_node operations from a Yjs Map event.
+ * This is only needed when the initial state is constructed as when Yjs populates the document
+ * it will yield a Y.MapEvent stating that "document" field has changed with potentially more than
+ * one children. The only way for Slate to interpret through operations is by multiple insert_node
+ * operations.
+ * All other changes to the document (not the data map), will yield Y.ArrayEvent that will be
+ * handled by arrayEvent.js.
+ * mapInsertNodeOperations(event: Y.YMapEvent<any>): InsertNodeOperation[]
+ */
 const mapInsertNodeOperations = (event) => {
-  const changes = Array.from(event.changes.keys.entries());
+  const changesKeys = Array.from(event.changes.keys.entries());
   const operations = [];
-  changes.forEach(([key]) => {
+  changesKeys.forEach(([key, action]) => {
     if (key === "document") {
       const documentNodes = event.target.get(key).toJSON();
-      const index = 0;
+      let index = 0;
       documentNodes.forEach((node) => {
         const blockNode = node;
         blockNode['nodes'] = node.children;
         const block = Block.create(blockNode);
         operations.push({ type: "insert_node", path: [index], node: block.toJSON() });
+        index += 1;
       });
     }
   });
@@ -21,13 +32,12 @@ const mapInsertNodeOperations = (event) => {
 };
 
 /**
- * Converts a Yjs Map event into Slate operations.
- *
- * mapEvent(event: Y.YMapEvent<any>): SetNodeOperation[]
+ * Extracts set_value or set_node operations from a Yjs Map event.
+ * mapInsertNodeOperations(event: Y.YMapEvent<any>): Operation[]
  */
-const mapEvent = (event) => {
+const mapSetValueOrSetNodeOperations = (event) => {
   /**
-   * convertMapOp(targetElement: event.target, key: string): json | string
+   * convertChildToSlate(targetElement: event.target, key: string): json | string
    */
   const convertChildToSlate = (targetElement, key) => {
     if (
@@ -77,10 +87,19 @@ const mapEvent = (event) => {
     };
     mapOperations = [changes.reduce(combineMapOp, baseOp)];
   }
-  const insertNodeOperations = mapInsertNodeOperations(event);
+  return mapOperations;
+}
 
-  // Combine changes into a single set node operation
-  return [...insertNodeOperations, ...mapOperations];
+/**
+ * Converts a Yjs Map event into Slate operations.
+ *
+ * mapEvent(event: Y.YMapEvent<any>): Operation[]
+ */
+const mapEvent = (event) => {
+  const insertNodeOperations = mapInsertNodeOperations(event);
+  const setValueOrSetNodeOperations = mapSetValueOrSetNodeOperations(event);
+
+  return [...insertNodeOperations, ...setValueOrSetNodeOperations];
 };
 
 module.exports = mapEvent;

@@ -60,10 +60,10 @@ describe("convert", () => {
       operations = operations.concat(ops);
     });
     const value = Value.create({
-      document: { nodes: [createLine([createText("mno")])] },
+      document: { nodes: [createLine([createText("Line 1")]), createLine([createText("Line 2")])] },
     });
     toSyncDoc(syncDoc, value);
-    expect(operations).toHaveLength(2);
+    expect(operations).toHaveLength(3);
     expect(operations[0]).toEqual(
       {
         type: "insert_node",
@@ -74,11 +74,26 @@ describe("convert", () => {
           nodes: [
             {
               object: "text",
-              leaves: [{ text: "mno", marks: [], object: "leaf" }],
+              leaves: [{ text: "Line 1", marks: [], object: "leaf" }],
             },
           ],
         },
         path: [0],
+      },
+      {
+        type: "insert_node",
+        node: {
+          object: "block",
+          type: "line",
+          data: {},
+          nodes: [
+            {
+              object: "text",
+              leaves: [{ text: "Line 2", marks: [], object: "leaf" }],
+            },
+          ],
+        },
+        path: [1],
       },
       {
         type: "set_value",
