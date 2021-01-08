@@ -1,5 +1,5 @@
 const Y = require("yjs");
-const { Block} = require("slate");
+const { Block } = require("slate");
 const { toSlatePath } = require("../utils/convert");
 
 const mapInsertNodeOperations = (event) => {
