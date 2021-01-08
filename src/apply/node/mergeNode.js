@@ -1,6 +1,5 @@
 const { SyncNode } = require('../../model');
 const { getParent } = require('../../path');
-const { cloneSyncElement } = require('../../utils/clone');
 
 /**
  * Applies a merge node operation to a SyncDoc.
@@ -36,7 +35,7 @@ const mergeNode = (doc, op) => {
     prevText.delete(0, prevText.length);
     prevText.applyDelta(combinedDelta);
   } else {
-    const toPush = SyncNode.getChildren(next).map(cloneSyncElement);
+    const toPush = SyncNode.getChildren(next).map(element => element.clone());
     SyncNode.getChildren(prev).push(toPush);
   }
 

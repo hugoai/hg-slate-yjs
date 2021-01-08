@@ -1,6 +1,5 @@
 const { SyncNode } = require('../../model');
 const { getParent } = require('../../path');
-const { cloneSyncElement } = require('../../utils/clone');
 
 /**
  * Applies a move node operation to a SyncDoc.
@@ -22,7 +21,7 @@ const moveNode = (doc, op) => {
   const fromChildren = SyncNode.getChildren(from);
   const toChildren = SyncNode.getChildren(to);
   const toMove = fromChildren.get(fromIndex);
-  const toInsert = cloneSyncElement(toMove);
+  const toInsert = toMove.clone();
 
   fromChildren.delete(fromIndex);
   toChildren.insert(Math.min(toIndex, toChildren.length), [toInsert]);
