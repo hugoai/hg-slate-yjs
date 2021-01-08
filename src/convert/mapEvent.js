@@ -15,7 +15,11 @@ const { toSlatePath } = require("../utils/convert");
 const mapInsertNodeOperations = (event) => {
   const changesKeys = Array.from(event.changes.keys.entries());
   const operations = [];
-  changesKeys.forEach(([key, action]) => {
+  changesKeys.forEach(([key, meta]) => {
+    if (key === 'document' && meta.action !== 'add') {
+      throw new Error("Unsupported Yjs event: ", event.toJSON());
+    }
+
     if (key === "document") {
       const documentNodes = event.target.get(key).toJSON();
       let index = 0;
