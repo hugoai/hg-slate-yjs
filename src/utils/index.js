@@ -1,1 +1,1 @@
-module.exports = Object.assign({}, require('./clone'), require('./convert'));
+module.exports = Object.assign({}, require('./convert'));

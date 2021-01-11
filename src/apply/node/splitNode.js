@@ -1,6 +1,5 @@
 const { SyncNode } = require('../../model');
 const { getParent } = require('../../path');
-const { cloneSyncElement } = require('../../utils/clone');
 
 /**
  * Applies a split node operation to a SyncDoc
@@ -12,7 +11,7 @@ const splitNode = (doc, op) => {
   const [parent, index] = getParent(syncDoc, op.path);
 
   const target = SyncNode.getChildren(parent).get(index);
-  const inject = cloneSyncElement(target);
+  const inject = target.clone();
   SyncNode.getChildren(parent).insert(index + 1, [inject]);
 
   if (SyncNode.getText(target) !== undefined) {
