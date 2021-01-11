@@ -59,12 +59,21 @@ describe("convert", () => {
       const ops = toSlateOps(events);
       operations = operations.concat(ops);
     });
-    const value = Value.create({
-      document: { nodes: [createLine([createText("Line 1")]), createLine([createText("Line 2")])] },
+    const formattedText = Text.create({
+      leaves: [{ text: "Line 2", marks: [{ type: "strong" }] }],
     });
+    const value = Value.create({
+      document: {
+        nodes: [
+          createLine([createText("Line 1")]),
+          createLine([formattedText]),
+        ],
+      },
+    });
+
     toSyncDoc(syncDoc, value);
     expect(operations).toHaveLength(3);
-    expect(operations[0]).toEqual(
+    expect(operations).toEqual([
       {
         type: "insert_node",
         node: {
@@ -89,7 +98,13 @@ describe("convert", () => {
           nodes: [
             {
               object: "text",
-              leaves: [{ text: "Line 2", marks: [], object: "leaf" }],
+              leaves: [
+                {
+                  text: "Line 2",
+                  marks: [{ type: "strong", object: "mark", data: {} }],
+                  object: "leaf",
+                },
+              ],
             },
           ],
         },
@@ -100,7 +115,7 @@ describe("convert", () => {
         properties: { data: {} },
         newProperties: {},
         path: [],
-      }
-    );
+      },
+    ]);
   });
 });
