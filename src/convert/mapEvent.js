@@ -1,6 +1,6 @@
 const Y = require("yjs");
 const { Block } = require("slate");
-const { toSlatePath } = require("../utils/convert");
+const { toSlatePath, toSlateNode } = require("../utils/convert");
 
 /**
  * Extracts insert_node operations from a Yjs Map event.
@@ -21,12 +21,9 @@ const mapInsertNodeOperations = (event) => {
     }
 
     if (key === "document") {
-      const documentNodes = event.target.get(key).toJSON();
       let index = 0;
-      documentNodes.forEach((node) => {
-        const blockNode = node;
-        blockNode['nodes'] = node.children;
-        const block = Block.create(blockNode);
+      const documentNodes = event.target.get(key).map(toSlateNode);
+      documentNodes.forEach((block) => {
         operations.push({ type: "insert_node", path: [index], node: block.toJSON() });
         index += 1;
       });
