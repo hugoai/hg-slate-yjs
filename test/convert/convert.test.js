@@ -1,5 +1,5 @@
 const { Value, Text } = require("slate");
-const { toSlateDoc, toSyncDoc } = require("../../src");
+const { toSlateDoc, toSyncDoc, toSlateOps } = require("../../src");
 const { createLine, createList, createMention, createText } = require("../utils");
 
 const Y = require("yjs");
