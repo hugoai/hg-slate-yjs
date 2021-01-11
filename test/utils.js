@@ -2,6 +2,29 @@ const { Block, Inline, Text, Value } = require("slate");
 const Y = require("yjs");
 const { toSyncDoc } = require("../src");
 
+const createList = (children, properties = {}) => {
+  const { indentation = 1, itemType = "bullet" } = properties;
+  let orderNumber = 0;
+  return Block.fromJSON({
+    object: "block",
+    type: "list",
+    data: {},
+    nodes: children.map(child => {
+      orderNumber = orderNumber + 1;
+      return Block.fromJSON({
+        object: "block",
+        type: "list_item",
+        data: {
+          indentation,
+          itemType,
+          orderNumber
+        },
+        nodes: [ child ],
+      })
+    })
+  });
+};
+
 const createLine = (children, properties = {}) => {
   return Block.fromJSON({
     object: "block",
@@ -47,6 +70,7 @@ const createDoc = (children) => {
 };
 
 module.exports = {
+  createList,
   createLine,
   createMention,
   createText,
