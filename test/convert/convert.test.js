@@ -1,6 +1,7 @@
 const { Value, Text } = require("slate");
 const { toSlateDoc, toSyncDoc, toSlateOps } = require("../../src");
-const { createLine, createMention, createText } = require("../utils");
+const { createLine, createList, createMention, createText } = require("../utils");
+
 const Y = require("yjs");
 
 const tests = [
@@ -34,6 +35,22 @@ const tests = [
         ],
       }),
     ]),
+  ],
+  [
+    "bullet list",
+    createList([createLine([createText("abcd")]),
+                createLine([createText("efgh")]),
+                createLine([createText("ijkl")]),
+               ],
+               { itemType: "bullet" })
+  ],
+  [
+    "numbered list",
+    createList([createLine([createText("mnop")]),
+                createLine([createText("qrst")]),
+                createLine([createText("uvwx")]),
+               ],
+               { itemType: "number" })
   ],
 ];
 
