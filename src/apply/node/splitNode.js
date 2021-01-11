@@ -12,6 +12,12 @@ const splitNode = (doc, op) => {
 
   const target = SyncNode.getChildren(parent).get(index);
   const inject = target.clone();
+
+  // Inject is a shallow clone of target at this point; they share the same
+  // 'data' member. Clone 'data' as well such that future changes to one aren't
+  // reflected in the other.
+  inject.set('data', Object.assign({}, target.get('data')));
+
   SyncNode.getChildren(parent).insert(index + 1, [inject]);
 
   if (SyncNode.getText(target) !== undefined) {
