@@ -78,5 +78,8 @@ describe("toSlateMarks", () => {
       expect(toSlateMarks(yjsFormattingAttributes)).toEqual(slateMarks);
     });
   });
-});
 
+  it("Clear mark", () => {
+    expect(toSlateMarks({ em: null })).toEqual([ Mark.create({ type: "em" }) ]);
+  });
+});
