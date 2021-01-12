@@ -69,7 +69,11 @@ const toSlateMarks = (attributes) => {
   const marks = [];
   if (!!attributes) {
     for (const markType in attributes) {
-      marks.push(Mark.create({ type: markType }));
+      let markAttrs = { type: markType };
+      if (attributes[markType] !== "true") {
+        markAttrs = { data: { value: attributes[markType] }, ...markAttrs };
+      }
+      marks.push(Mark.create(markAttrs));
     }
   }
   return marks;
@@ -147,12 +151,15 @@ const toFormattingAttributes = (marks, setMark = true) => {
   marks.forEach(mark => {
     // If setMark is false, use a value of null to indicate that application of
     // the resulting formatting attributes should cause the mark to be cleared.
-    //
-    // TBD: Perhaps use true (boolean) instead of 'true' (string) here?
-    // Currently using 'true' because the Yjs API documentation suggests that
-    // the formatting attributes should be Object<string, string>, though the
-    // provided example seems to show Object<string, boolean> instead ...
-    result[mark.type] = setMark ? 'true' : null;
+    let value = null;
+    if (setMark) {
+      if (mark.data && mark.data.has("value")) {
+        value = mark.data.get("value");
+      } else {
+        value = "true";
+      }
+    }
+    result[mark.type] = value;
   })
   return result;
 };
