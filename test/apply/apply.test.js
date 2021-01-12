@@ -254,6 +254,28 @@ const transforms = [
     [
       createLine([createText('hotel uniform golf oscar')])
     ],
+  ],
+  [
+    "insert_text with mark",
+    [createLine([createText("test")])],
+    [
+      {
+        marks: [{ type: 'em' }],
+        offset: 1,
+        path: [0, 0],
+        text: "acos are b",
+        type: "insert_text",
+      },
+    ],
+    [
+      createLine([Text.create({
+        leaves: [
+          { text: "t" },
+          { text: "acos are b", marks: [{ type: "em" }]},
+          { text: "est" },
+        ],
+      })])
+    ],
   ]
 ];
 
