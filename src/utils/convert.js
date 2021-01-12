@@ -70,7 +70,7 @@ const toSlateMarks = (attributes) => {
   if (!!attributes) {
     for (const markType in attributes) {
       let markAttrs = { type: markType };
-      if (attributes[markType] !== "true") {
+      if (attributes[markType] !== null && attributes[markType] !== "true") {
         markAttrs = { data: { value: attributes[markType] }, ...markAttrs };
       }
       marks.push(Mark.create(markAttrs));

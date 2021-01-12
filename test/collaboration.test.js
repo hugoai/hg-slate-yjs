@@ -426,6 +426,7 @@ const tests = [
 ];
 
 const nodeToJSON = (node) => node.toJSON();
+
 // Returns slate document as JSON.
 const getSlateDocAsJSON = (editor) => {
   return editor.slateDoc.document.nodes.toArray().map(nodeToJSON)
