@@ -1,4 +1,4 @@
-const { toSlateMarks, toSlatePath } = require('../utils/convert');
+const { toFormattingAttributesKey, toSlateMarks, toSlatePath } = require('../utils/convert');
 
 /**
  * Converts a Yjs Text event into Slate operations.
@@ -33,7 +33,7 @@ const textEvent = (event) => {
    */
   const createMarkOps = (offset, length, attributes) => {
     return toSlateMarks(attributes).map(mark => ({
-      type: ((attributes[mark.type] !== null) ? 'add_mark' : 'remove_mark'),
+      type: ((attributes[toFormattingAttributesKey(mark)] !== null) ? 'add_mark' : 'remove_mark'),
       path: eventTargetPath,
       offset,
       length,

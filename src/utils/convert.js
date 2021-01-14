@@ -69,9 +69,10 @@ const toSlateMarks = (attributes) => {
   const marks = [];
   if (!!attributes) {
     for (const markType in attributes) {
-      let markAttrs = { type: markType };
-      if (attributes[markType] !== null && attributes[markType] !== "true") {
-        markAttrs = { data: { value: attributes[markType] }, ...markAttrs };
+      const s = markType.split(':');
+      let markAttrs = { type: s[0] };
+      if (s.length > 1) {
+        markAttrs = { data: { value: s[1] }, ...markAttrs };
       }
       marks.push(Mark.create(markAttrs));
     }
@@ -142,6 +143,20 @@ const toSyncElement = (node) => {
 };
 
 /**
+ * Returns the formatting attributes key that should be used for the given slate
+ * Mark.
+ *
+ * toFormattingAttributesKey(Mark): string
+ */
+const toFormattingAttributesKey = (mark) => {
+  let key = mark.type;
+  if (mark.data && mark.data.has("value")) {
+    key = `${key}:${mark.data.get("value")}`;
+  }
+  return key;
+};
+
+/**
  * Converts a List of slate Marks to Yjs formatting attributes
  *
  * toFormattingAttributes(List<Mark>, boolean): Object<string, string>
@@ -151,15 +166,7 @@ const toFormattingAttributes = (marks, setMark = true) => {
   marks.forEach(mark => {
     // If setMark is false, use a value of null to indicate that application of
     // the resulting formatting attributes should cause the mark to be cleared.
-    let value = null;
-    if (setMark) {
-      if (mark.data && mark.data.has("value")) {
-        value = mark.data.get("value");
-      } else {
-        value = "true";
-      }
-    }
-    result[mark.type] = value;
+    result[toFormattingAttributesKey(mark)] = setMark ? "true" : null;
   })
   return result;
 };
@@ -175,6 +182,7 @@ const toSlatePath = (path) => {
 
 module.exports = {
   toFormattingAttributes,
+  toFormattingAttributesKey,
   toSlateMarks,
   toSlateNode,
   toSlateDoc,
