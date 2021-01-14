@@ -36,12 +36,12 @@ const tests = [
   [
     "Text color",
     [ Mark.create({ type: "text_color", data: { value: "#123456" }}) ],
-    { text_color: "#123456" }
+    { 'text_color:#123456': "true" }
   ],
   [
     "Highlight color",
     [ Mark.create({ type: "highlight_color", data: { value: "#edcba9" }}) ],
-    { highlight_color: "#edcba9" }
+    { 'highlight_color:#edcba9': "true" }
   ],
   [
     "Text and highlight colors",
@@ -50,8 +50,8 @@ const tests = [
       Mark.create({ type: "highlight_color", data: { value: "#dcba98" }})
     ],
     {
-      text_color: "#234567",
-      highlight_color: "#dcba98"
+      'text_color:#234567': "true",
+      'highlight_color:#dcba98': "true"
     }
   ],
 ];
