@@ -61,20 +61,29 @@ const toSlateLeaf = (delta) => {
 }
 
 /**
+ * Converts a Yjs formatting attributes key to the corresponding slate Mark
+ *
+ * toSlateMark(string): Mark
+ */
+const toSlateMark = (formattingAttributesKey) => {
+  const s = formattingAttributesKey.split(':');
+  let markAttrs = { type: s[0] };
+  if (s.length > 1) {
+    markAttrs = { data: { value: s[1] }, ...markAttrs };
+  }
+  return Mark.create(markAttrs);
+}
+
+/**
  * Converts Yjs formatting attributes to a List of slate Marks
  *
  * toSlateMarks(Object<string, string>): Mark[]
  */
-const toSlateMarks = (attributes) => {
+const toSlateMarks = (formattingAttributes) => {
   const marks = [];
-  if (!!attributes) {
-    for (const markType in attributes) {
-      const s = markType.split(':');
-      let markAttrs = { type: s[0] };
-      if (s.length > 1) {
-        markAttrs = { data: { value: s[1] }, ...markAttrs };
-      }
-      marks.push(Mark.create(markAttrs));
+  if (!!formattingAttributes) {
+    for (const formattingAttributesKey in formattingAttributes) {
+      marks.push(toSlateMark(formattingAttributesKey));
     }
   }
   return marks;
