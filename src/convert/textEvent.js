@@ -1,3 +1,4 @@
+const Y = require("yjs");
 const { toFormattingAttributesKey, toSlateMarks, toSlatePath } = require('../utils/convert');
 
 /**
@@ -64,7 +65,7 @@ const textEvent = (event) => {
 
         // Skip deleted items that don't contain text (e.g., some only contain
         // formatting attributes).
-        if (content && content.constructor.name === "ContentString") {
+        if (content && content instanceof Y.ContentString) {
           text = text.concat(content.str);
         }
       }

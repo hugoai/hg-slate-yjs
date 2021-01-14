@@ -16,7 +16,7 @@ const mapInsertNodeOperations = (event) => {
   const changesKeys = Array.from(event.changes.keys.entries());
   const operations = [];
   changesKeys.forEach(([key, meta]) => {
-    if (key === 'document' && meta.action !== 'add') {
+    if (key === "document" && meta.action !== "add") {
       throw new Error("Unsupported Yjs event: ", event.toJSON());
     }
 
@@ -24,7 +24,11 @@ const mapInsertNodeOperations = (event) => {
       let index = 0;
       const documentNodes = event.target.get(key).map(toSlateNode);
       documentNodes.forEach((block) => {
-        operations.push({ type: "insert_node", path: [index], node: block.toJSON() });
+        operations.push({
+          type: "insert_node",
+          path: [index],
+          node: block.toJSON(),
+        });
         index += 1;
       });
     }
@@ -41,14 +45,15 @@ const mapSetValueOrSetNodeOperations = (event) => {
    * convertChildToSlate(targetElement: event.target, key: string): json | string
    */
   const convertChildToSlate = (targetElement, key) => {
+    const element = targetElement.get(key);
     if (
-      ["YMap", "YArray", "YText"].includes(
-        targetElement.get(key).constructor.name
-      )
+      element instanceof Y.Map ||
+      element instanceof Y.Array ||
+      element instanceof Y.Text
     ) {
-      return targetElement.get(key).toJSON();
+      return element.toJSON();
     }
-    return targetElement.get(key);
+    return element;
   };
 
   /**
@@ -89,7 +94,7 @@ const mapSetValueOrSetNodeOperations = (event) => {
     mapOperations = [changes.reduce(combineMapOp, baseOp)];
   }
   return mapOperations;
-}
+};
 
 /**
  * Converts a Yjs Map event into Slate operations.
