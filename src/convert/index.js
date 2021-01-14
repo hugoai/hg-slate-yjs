@@ -1,4 +1,5 @@
 const _ = require("lodash");
+const Y = require("yjs");
 const arrayEvent = require("./arrayEvent");
 const mapEvent = require("./mapEvent");
 const textEvent = require("./textEvent");
@@ -18,15 +19,15 @@ const toSlateOps = (events) => {
  * toSlateOp(event: Y.YEvent): Operation[]
  */
 const toSlateOp = (event) => {
-  if (event.constructor.name === "YArrayEvent") {
+  if (event instanceof Y.YArrayEvent) {
     return arrayEvent(event);
   }
 
-  if (event.constructor.name === "YMapEvent") {
+  if (event instanceof Y.YMapEvent) {
     return mapEvent(event);
   }
 
-  if (event.constructor.name === "YTextEvent") {
+  if (event instanceof Y.YTextEvent) {
     return textEvent(event);
   }
 
