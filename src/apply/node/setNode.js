@@ -1,4 +1,3 @@
-const { SyncElement } = require('../../model');
 const { getTarget } = require('../../path');
 
 /**
@@ -7,20 +6,20 @@ const { getTarget } = require('../../path');
  * setNode(doc: SyncDoc, op: SetNodeOperation): SyncDoc
  */
 const setNode = (doc, op) => {
-  const syncDoc = doc.get('document')
-  const node = getTarget(syncDoc, op.path);
+    const syncDoc = doc.get('document');
+    const node = getTarget(syncDoc, op.path);
 
-  const properties = node.get('data');
-  for (const [key, value] of Object.entries(op.properties.data.toJSON())) {
-    if (key === 'children' || key === 'text') {
-      throw new Error(`Cannot set the "${key}" property of nodes!`);
+    const properties = node.get('data');
+    for (const [key, value] of Object.entries(op.properties.data.toJSON())) {
+        if (key === 'children' || key === 'text') {
+            throw new Error(`Cannot set the "${key}" property of nodes!`);
+        }
+
+        properties[key] = value;
     }
+    node.set('data', properties);
 
-    properties[key] = value;
-  }
-  node.set('data', properties);
-
-  return doc;
+    return doc;
 };
 
 module.exports = setNode;

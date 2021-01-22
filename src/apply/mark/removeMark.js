@@ -8,11 +8,11 @@ const { toFormattingAttributes } = require('../../utils');
  * removeMark(doc: SyncDoc, op: MarkOperation): SyncDoc
  */
 const removeMark = (doc, op) => {
-  const syncDoc = doc.get('document')
-  const node = getTarget(syncDoc, op.path);
-  const nodeText = SyncElement.getText(node);
-  nodeText.format(op.offset, op.length, toFormattingAttributes([op.mark], false));
-  return doc;
+    const syncDoc = doc.get('document');
+    const node = getTarget(syncDoc, op.path);
+    const nodeText = SyncElement.getText(node);
+    nodeText.format(op.offset, op.length, toFormattingAttributes([op.mark], false));
+    return doc;
 };
 
 module.exports = removeMark;
