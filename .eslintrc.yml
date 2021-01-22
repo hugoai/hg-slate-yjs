@@ -1,0 +1,35 @@
+extends:
+    - airbnb-base
+    - plugin:jest/recommended
+    - prettier
+
+plugins:
+    - node
+    - jest
+    - prettier
+
+rules:
+    no-console: off
+    no-else-return: off
+    node/exports-style:
+        - error
+        - module.exports
+    no-await-in-loop: off
+    no-restricted-syntax: off
+    no-underscore-dangle: off
+    prefer-destructuring: off
+    no-plusplus: off
+    valid-jsdoc: off
+    no-loop-func: off
+    no-return-assign:
+        - error
+        - except-parens
+    prettier/prettier:
+        - warn
+        -
+            printWidth: 100
+            tabWidth: 4
+            singleQuote: true
+
+env:
+    jest: true
