@@ -8,12 +8,12 @@ const { toFormattingAttributes } = require('../../utils');
  * insertText(doc: SyncDoc, op: InsertTextOperation): SyncDoc
  */
 const insertText = (doc, op) => {
-  const syncDoc = doc.get('document')
-  const node = getTarget(syncDoc, op.path);
-  const format = toFormattingAttributes(op.marks);
-  const nodeText = SyncElement.getText(node);
-  nodeText.insert(op.offset, op.text, format);
-  return doc;
+    const syncDoc = doc.get('document');
+    const node = getTarget(syncDoc, op.path);
+    const format = toFormattingAttributes(op.marks);
+    const nodeText = SyncElement.getText(node);
+    nodeText.insert(op.offset, op.text, format);
+    return doc;
 };
 
 module.exports = insertText;

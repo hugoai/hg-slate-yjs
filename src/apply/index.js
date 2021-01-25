@@ -1,19 +1,18 @@
-const { Operation } = require('slate');
 const node = require('./node');
 const text = require('./text');
-const value = require('./value')
-const mark = require('./mark')
+const value = require('./value');
+const mark = require('./mark');
 
 const nullOp = (doc) => doc;
 
 const opMappers = {
-  ...text,
-  ...node,
-  ...value,
-  ...mark,
+    ...text,
+    ...node,
+    ...value,
+    ...mark,
 
-  // SetSelection is currently a null op since we don't support cursors
-  set_selection: nullOp,
+    // SetSelection is currently a null op since we don't support cursors
+    set_selection: nullOp,
 };
 
 /**
@@ -22,19 +21,19 @@ const opMappers = {
  * applySlateOp(doc: SyncDoc, op: Operation): SyncDoc
  */
 const applySlateOp = (doc, op) => {
-  try {
-    const apply = opMappers[op.type];
-    if (!apply) {
-      throw new Error(`Unknown operation: ${op.type}`);
-    }
+    try {
+        const apply = opMappers[op.type];
+        if (!apply) {
+            throw new Error(`Unknown operation: ${op.type}`);
+        }
 
-    return apply(doc, op);
-  } catch (e) {
-    // TODO: We probably don't want to catch/swallow this exception -- either
-    // don't catch it or log and rethrow?
-    console.error(e, op, doc.toJSON());
-    return doc;
-  }
+        return apply(doc, op);
+    } catch (e) {
+        // TODO: We probably don't want to catch/swallow this exception -- either
+        // don't catch it or log and rethrow?
+        console.error(e, op, doc.toJSON());
+        return doc;
+    }
 };
 
 /**
@@ -42,8 +41,6 @@ const applySlateOp = (doc, op) => {
  *
  * applySlateOps(doc: SyncDoc, operations: Operation[]): SyncDoc
  */
-const applySlateOps = (doc, operations) => {
-  return operations.reduce(applySlateOp, doc);
-};
+const applySlateOps = (doc, operations) => operations.reduce(applySlateOp, doc);
 
 module.exports = { applySlateOp, applySlateOps };

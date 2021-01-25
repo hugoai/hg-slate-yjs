@@ -1,8 +1,7 @@
-module.exports = Object.assign(
-  {},
-  require('./apply'),
-  require('./convert'),
-  require('./model'),
-  require('./path'),
-  require('./utils')
-);
+const apply = require('./apply');
+const convert = require('./convert');
+const model = require('./model');
+const path = require('./path');
+const utils = require('./utils');
+
+module.exports = { ...convert, ...apply, ...model, ...path, ...utils };

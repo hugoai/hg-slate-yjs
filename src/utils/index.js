@@ -1,1 +1,3 @@
-module.exports = Object.assign({}, require('./convert'));
+const convert = require('./convert');
+
+module.exports = { ...convert };
