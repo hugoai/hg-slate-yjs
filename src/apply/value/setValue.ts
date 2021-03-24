@@ -1,8 +1,7 @@
 import * as Y from 'yjs';
-import { Operation } from 'slate';
-import { SyncDoc } from 'types';
+import { SyncDoc, SlateOperation } from 'types';
 
-const setValue = (doc: SyncDoc, op: Operation): SyncDoc => {
+const setValue = (doc: SyncDoc, op: SlateOperation): SyncDoc => {
     if (op.properties && op.properties.data) {
         const newData = new Y.Map();
         for (const [key, value] of Object.entries(op.properties.data.toJSON())) {
