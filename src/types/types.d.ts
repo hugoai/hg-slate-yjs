@@ -1,5 +1,5 @@
 import * as Y from 'yjs';
-import { Block, Document, Inline, Leaf, Mark, Text, Value } from 'slate';
+import { Block, Inline, Text } from 'slate';
 
 type SyncElementType = Y.Map<any>;
 type SyncDoc = Y.Array<SyncElementType>;
