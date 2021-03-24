@@ -1,27 +1,27 @@
-import { SyncDoc, SyncElementType, SyncNodeType } from 'types';
+import { SyncDoc, SyncArray, SyncNodeType } from 'types';
 import * as Y from 'yjs';
 
 export const SyncElement = {
     /**
-     * getText(element: SyncElement): Y.Text | undefined
+     * getText(element: SyncDoc): Y.Text | undefined
      */
-    getText(element: SyncElementType): Y.Text | undefined {
+    getText(element: SyncDoc): Y.Text | undefined {
         return element && element.get('text');
     },
 
     /**
-     * getChildren(element: SyncElement): SyncDoc | undefined
+     * getChildren(element: SyncDoc): SyncArray | undefined
      */
-    getChildren(element: SyncElementType): SyncDoc | undefined {
+    getChildren(element: SyncDoc): SyncArray | undefined {
         return element && element.get('children');
     },
 };
 
 export const SyncNode = {
     /**
-     * getChildren(node: SyncNodeType): SyncDoc | undefined
+     * getChildren(node: SyncNodeType): SyncArray | undefined
      */
-    getChildren(node: SyncNodeType): SyncDoc | undefined {
+    getChildren(node: SyncNodeType): SyncArray | undefined {
         if (node && node instanceof Y.Array) {
             return node;
         }

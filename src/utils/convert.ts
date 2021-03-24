@@ -3,7 +3,7 @@
 /* eslint-disable valid-jsdoc */
 import { AttributeMap, Delta } from 'delta.interface';
 import { Block, Document, Inline, Leaf, Mark, Text, Value } from 'slate';
-import { Node, SyncDoc, SyncElementType } from 'types';
+import { Node, SyncDoc, SyncArray } from 'types';
 import * as Y from 'yjs';
 import { SyncElement } from '../model';
 import { MarkAttrs } from '../types/mark.interface';
@@ -56,9 +56,9 @@ const toSlateLeaf = (delta: Delta): Leaf => {
 /**
  * Converts a sync element to a slate node
  *
- * toSlateNode(element: SyncElementType): Node
+ * toSlateNode(element: SyncDoc): Node
  */
-export const toSlateNode = (element: SyncElementType): Node => {
+export const toSlateNode = (element: SyncDoc): Node => {
     let attrs = {};
     for (const [key, value] of element.entries()) {
         if (key !== 'children' && key !== 'text' && key !== 'marks') {
@@ -96,13 +96,13 @@ export const toSlateNode = (element: SyncElementType): Node => {
 /**
  * Converts a SyncDoc to a Slate doc
  *
- * toSlateDoc(syncDoc: SyncElementType): Value
+ * toSlateDoc(syncDoc: SyncDoc): Value
  */
-export const toSlateDoc = (syncMap: SyncElementType): Value => {
-    const documentNodes: SyncDoc = syncMap.get('document') || [];
+export const toSlateDoc = (syncDoc: SyncDoc): Value => {
+    const documentNodes: SyncArray = syncDoc.get('document') || [];
     const nodes = documentNodes.map(toSlateNode);
     const document = Document.create({ nodes });
-    const data = syncMap.get('data');
+    const data = syncDoc.get('data');
     return Value.create({ document, data: data ? data.toJSON() : {} });
 };
 
@@ -141,9 +141,9 @@ export const toFormattingAttributes = (
 /**
  * Converts a slate node to a sync element
  *
- * toSyncElement(node: Node): SyncElement
+ * toSyncElement(node: Node): SyncDoc
  */
-export const toSyncElement = (node: Node): SyncElementType => {
+export const toSyncElement = (node: Node): SyncDoc => {
     const element = new Y.Map();
 
     if (Block.isBlock(node) || Inline.isInline(node)) {
@@ -157,7 +157,7 @@ export const toSyncElement = (node: Node): SyncElementType => {
         const textElement = new Y.Text(node.text);
         element.set('text', textElement);
         let index = 0;
-        node.getLeaves().forEach((leaf) => {
+        node.getLeaves().forEach((leaf: Leaf) => {
             if (leaf.marks.size > 0) {
                 textElement.format(index, leaf.text.length, toFormattingAttributes(leaf.marks));
             }
@@ -178,9 +178,9 @@ export const toSyncElement = (node: Node): SyncElementType => {
  * Converts all elements into a Slate doc to SyncElements and adds them to the
  * SyncDoc
  *
- * toSyncDoc(syncDoc: SyncElementType, value: Value): void
+ * toSyncDoc(syncDoc: SyncDoc, value: Value): void
  */
-export const toSyncDoc = (syncDoc: SyncElementType, value: Value): void => {
+export const toSyncDoc = (syncDoc: SyncDoc, value: Value): void => {
     const document = new Y.Array();
     document.insert(0, value.document.nodes.map(toSyncElement));
     syncDoc.set('document', document);
