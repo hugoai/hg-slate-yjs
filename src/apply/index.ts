@@ -1,9 +1,11 @@
-const node = require('./node');
-const text = require('./text');
-const value = require('./value');
-const mark = require('./mark');
+import { SyncDoc } from 'types';
+import { Operation } from 'slate';
+import node from './node';
+import text from './text';
+import value from './value';
+import mark from './mark';
 
-const nullOp = (doc) => doc;
+const nullOp = (doc: SyncDoc) => doc;
 
 const opMappers = {
     ...text,
@@ -20,7 +22,7 @@ const opMappers = {
  *
  * applySlateOp(doc: SyncDoc, op: Operation): SyncDoc
  */
-const applySlateOp = (doc, op) => {
+export const applySlateOp = (doc: SyncDoc, op: Operation): SyncDoc => {
     try {
         const apply = opMappers[op.type];
         if (!apply) {
@@ -41,6 +43,5 @@ const applySlateOp = (doc, op) => {
  *
  * applySlateOps(doc: SyncDoc, operations: Operation[]): SyncDoc
  */
-const applySlateOps = (doc, operations) => operations.reduce(applySlateOp, doc);
-
-module.exports = { applySlateOp, applySlateOps };
+export const applySlateOps = (doc: SyncDoc, operations: Operation[]): SyncDoc =>
+    operations.reduce(applySlateOp, doc);
