@@ -1,20 +1,22 @@
-const Y = require('yjs');
-const { SyncNode } = require('../model');
+/* eslint-disable @typescript-eslint/dot-notation */
+import { SyncDoc, SlatePath } from 'types';
+import * as Y from 'yjs';
+import { SyncNode } from '../model';
 
 /**
  * Returns the SyncNode referenced by the path
  *
  * getTarget(doc: SyncDoc, path: Path): SyncNode | undefined
  */
-const getTarget = (doc, path) => {
+export const getTarget = (doc: SyncDoc, path: SlatePath): SyncDoc | undefined => {
     /**
      * iterate(current: SyncNode, idx: number): SyncNode
      */
-    const iterate = (current, idx) => {
+    const iterate = (current?: SyncDoc, idx?: number): SyncDoc => {
         let result;
         const children = SyncNode.getChildren(current);
         if (children) {
-            result = children.get(idx);
+            result = idx && children.get(idx);
         }
         if (!result) {
             throw new TypeError(
@@ -30,7 +32,7 @@ const getTarget = (doc, path) => {
 /**
  * getParentPath(path: Path, level = 1): [number, Path]
  */
-const getParentPath = (path, level = 1) => {
+export const getParentPath = (path: SlatePath, level = 1): [number, SlatePath] => {
     if (level > path.size) {
         throw new TypeError('requested ancestor is higher than root');
     }
@@ -39,9 +41,13 @@ const getParentPath = (path, level = 1) => {
 };
 
 /**
- * getParent(doc: SyncDoc, path: Path, level = 1): [SyncNode, number]
+ * getParent(doc: SyncDoc, path: Path, level = 1): [SyncDoc | undefined, number]
  */
-const getParent = (doc, path, level = 1) => {
+export const getParent = (
+    doc: SyncDoc,
+    path: SlatePath,
+    level = 1
+): [SyncDoc | undefined, number] => {
     const [idx, parentPath] = getParentPath(path, level);
     return [getTarget(doc, parentPath), idx];
 };
@@ -51,16 +57,17 @@ const getParent = (doc, path, level = 1) => {
  *
  * getArrayPosition(item: Y.Item): number
  */
-const getArrayPosition = (item) => {
+export const getArrayPosition = (item: Y.Item): number => {
     let i = 0;
-    let c = item.parent._start;
-    while (c !== item && c !== null) {
-        if (!c.deleted) {
-            i++;
+    if (item.parent) {
+        let c = item.parent['_start'];
+        while (c !== item && c !== null) {
+            if (!c.deleted) {
+                i++;
+            }
+            c = c.right;
         }
-        c = c.right;
     }
-
     return i;
 };
 
@@ -69,7 +76,7 @@ const getArrayPosition = (item) => {
  *
  * getSyncItemPath(item: Y.Item): Path
  */
-const getSyncItemPath = (item) => {
+export const getSyncItemPath = (item: Y.Item | null): SlatePath => {
     if (!item) {
         return [];
     }
@@ -84,12 +91,4 @@ const getSyncItemPath = (item) => {
     }
 
     throw new Error(`Unknown parent type ${parent}`);
-};
-
-module.exports = {
-    getTarget,
-    getParentPath,
-    getParent,
-    getSyncItemPath,
-    getArrayPosition,
 };
