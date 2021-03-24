@@ -1,5 +1,5 @@
-import { SyncDoc } from 'types';
-import { Operation } from 'slate';
+import { SyncDoc, SlateOperation } from 'types';
+
 import node from './node';
 import text from './text';
 import value from './value';
@@ -20,9 +20,9 @@ const opMappers = {
 /**
  * Applies a slate operation to a SyncDoc
  *
- * applySlateOp(doc: SyncDoc, op: Operation): SyncDoc
+ * applySlateOp(doc: SyncDoc, op: SlateOperation): SyncDoc
  */
-export const applySlateOp = (doc: SyncDoc, op: Operation): SyncDoc => {
+export const applySlateOp = (doc: SyncDoc, op: SlateOperation): SyncDoc => {
     try {
         const apply = opMappers[op.type];
         if (!apply) {
@@ -43,5 +43,5 @@ export const applySlateOp = (doc: SyncDoc, op: Operation): SyncDoc => {
  *
  * applySlateOps(doc: SyncDoc, operations: Operation[]): SyncDoc
  */
-export const applySlateOps = (doc: SyncDoc, operations: Operation[]): SyncDoc =>
+export const applySlateOps = (doc: SyncDoc, operations: SlateOperation[]): SyncDoc =>
     operations.reduce(applySlateOp, doc);
