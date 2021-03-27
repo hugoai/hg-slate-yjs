@@ -4,3 +4,11 @@ export interface MarkAttrs {
         value: string;
     };
 }
+
+export interface MarkOperation {
+    type: string;
+    path: Iterable<number>;
+    offset: number;
+    length: number;
+    mark: MarkAttrs;
+}
