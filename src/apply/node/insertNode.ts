@@ -1,13 +1,15 @@
-const { SyncNode } = require('../../model');
-const { getParent } = require('../../path');
-const { toSyncElement } = require('../../utils/convert');
+import { InsertNodeOperation } from 'node.interface';
+import { SyncDoc } from 'types';
+import { SyncNode } from '../../model';
+import { getParent } from '../../path';
+import { toSyncElement } from '../../utils/convert';
 
 /**
  * Applies an insert node operation to a SyncDoc.
  *
  * insertNode(doc: SyncDoc, op: InsertNodeOperation): SyncDoc
  */
-const insertNode = (doc, op) => {
+const insertNode = (doc: SyncDoc, op: InsertNodeOperation): SyncDoc => {
     const syncDoc = doc.get('document');
     const [parent, index] = getParent(syncDoc, op.path);
 
@@ -16,8 +18,8 @@ const insertNode = (doc, op) => {
         throw new TypeError("Can't insert node into text node");
     }
 
-    SyncNode.getChildren(parent).insert(index, [toSyncElement(op.node)]);
+    children.insert(index, [toSyncElement(op.node)]);
     return doc;
 };
 
-module.exports = insertNode;
+export default insertNode;
