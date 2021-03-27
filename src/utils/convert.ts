@@ -2,8 +2,8 @@
 /* eslint-disable no-extra-boolean-cast */
 /* eslint-disable valid-jsdoc */
 import { AttributeMap, Delta } from 'delta.interface';
-import { Block, Document, Inline, Leaf, Mark, Text, Value } from 'slate';
-import { Node, SyncDoc, SyncArray } from 'types';
+import { Block, Document, Inline, Leaf, Mark, Text, Value, Node } from 'slate';
+import { SyncDoc, SyncArray, SlatePath } from 'types';
 import * as Y from 'yjs';
 import { SyncElement } from '../model';
 import { MarkAttrs } from '../types/mark.interface';
@@ -192,5 +192,5 @@ export const toSyncDoc = (syncDoc: SyncDoc, value: Value): void => {
  *
  * toSlatePath(path: (string | number)[]): Path
  */
-export const toSlatePath = (path: Array<string | number>): Array<string | number> =>
+export const toSlatePath = (path: SlatePath): SlatePath =>
     path.filter((node) => typeof node === 'number');
