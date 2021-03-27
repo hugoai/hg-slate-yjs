@@ -21,6 +21,7 @@ parserOptions:
 
 rules:
     '@typescript-eslint/no-explicit-any': off
+    '@typescript-eslint/dot-notation': off
     import/no-cycle: off
     no-console: off
     no-else-return: off
