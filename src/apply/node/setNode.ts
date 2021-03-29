@@ -10,9 +10,9 @@ import { getTarget } from '../../path';
 const setNode = (doc: SyncDoc, op: SetNodeOperation): SyncDoc => {
     const syncDoc = doc.get('document');
     const node = getTarget(syncDoc, op.path);
-    if (node) {
+    if (node !== undefined) {
         const properties = node.get('data');
-        for (const [key, value] of Object.entries(op.properties.data)) {
+        for (const [key, value] of Object.entries(op.properties.data.toJSON())) {
             if (key === 'children' || key === 'text') {
                 throw new Error(`Cannot set the "${key}" property of nodes!`);
             }

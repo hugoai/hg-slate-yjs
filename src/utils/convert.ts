@@ -114,7 +114,7 @@ export const toSlateDoc = (syncDoc: SyncDoc): Value => {
  */
 export const toFormattingAttributesKey = (mark: Mark): string => {
     let key = mark.type;
-    if (mark.data && mark.data.has('value')) {
+    if (mark.data !== undefined && mark.data.has('value')) {
         key = `${key}:${mark.data.get('value')}`;
     }
     return key;

@@ -14,7 +14,7 @@ const mergeNode = (doc: SyncDoc, op: MergeNodeOperation): SyncDoc => {
     const [parent, index] = getParent(syncDoc, op.path);
 
     const children = SyncNode.getChildren(parent);
-    if (children) {
+    if (children !== undefined) {
         const prev = children.get(index - 1);
         const next = children.get(index);
 

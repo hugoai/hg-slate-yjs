@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/dot-notation */
-import { SyncDoc, SlatePath } from 'types';
+import { SyncDoc, SlatePath, SyncNodeType } from 'types';
 import * as Y from 'yjs';
 import { SyncNode } from '../model';
 
@@ -8,17 +8,17 @@ import { SyncNode } from '../model';
  *
  * getTarget(doc: SyncDoc, path: Path): SyncNode | undefined
  */
-export const getTarget = (doc: SyncDoc, path: SlatePath): SyncDoc | undefined => {
+export const getTarget = (doc: SyncDoc, path: SlatePath): SyncNodeType | undefined => {
     /**
      * iterate(current: SyncNode, idx: number): SyncNode
      */
-    const iterate = (current?: SyncDoc, idx?: number): SyncDoc => {
-        let result;
+    const iterate = (current?: SyncDoc, idx?: number): SyncNodeType => {
+        let result: SyncDoc | undefined;
         const children = SyncNode.getChildren(current);
-        if (children) {
-            result = idx && children.get(idx);
+        if (children !== undefined && idx !== undefined) {
+            result = children.get(idx);
         }
-        if (!result) {
+        if (result === undefined) {
             throw new TypeError(
                 `path ${path.toString()} does not match doc ${JSON.stringify(doc)}`
             );
@@ -47,7 +47,7 @@ export const getParent = (
     doc: SyncDoc,
     path: SlatePath,
     level = 1
-): [SyncDoc | undefined, number] => {
+): [SyncNodeType | undefined, number] => {
     const [idx, parentPath] = getParentPath(path, level);
     return [getTarget(doc, parentPath), idx];
 };
