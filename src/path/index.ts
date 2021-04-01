@@ -6,13 +6,13 @@ import { SyncNode } from '../model';
 /**
  * Returns the SyncNode referenced by the path
  *
- * getTarget(doc: SyncDoc, path: Path): SyncNode | undefined
+ * getTarget(doc: SyncDoc, path: Path): SyncDoc | undefined
  */
-export const getTarget = (doc: SyncDoc, path: SlatePath): SyncNodeType | undefined => {
+export const getTarget = (doc: SyncDoc, path: SlatePath): SyncDoc | undefined => {
     /**
-     * iterate(current: SyncNode, idx: number): SyncNode
+     * iterate(current: SyncDoc, idx: number): SyncDoc
      */
-    const iterate = (current?: SyncDoc, idx?: number): SyncNodeType => {
+    const iterate = (current?: SyncDoc, idx?: number): SyncDoc => {
         let result: SyncDoc | undefined;
         const children = SyncNode.getChildren(current);
         if (children !== undefined && idx !== undefined) {
