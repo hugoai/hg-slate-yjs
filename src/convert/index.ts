@@ -1,15 +1,17 @@
-const _ = require('lodash');
-const Y = require('yjs');
-const arrayEvent = require('./arrayEvent');
-const mapEvent = require('./mapEvent');
-const textEvent = require('./textEvent');
+import _ from 'lodash';
+import { SlateOperation } from 'types';
+
+import * as Y from 'yjs';
+import arrayEvent from './arrayEvent';
+import mapEvent from './mapEvent';
+import textEvent from './textEvent';
 
 /**
  * Converts a yjs event into slate operations.
  *
  * toSlateOp(event: Y.YEvent): Operation[]
  */
-const toSlateOp = (event) => {
+export const toSlateOp = (event: Y.YEvent): SlateOperation[] => {
     if (event instanceof Y.YArrayEvent) {
         return arrayEvent(event);
     }
@@ -30,6 +32,5 @@ const toSlateOp = (event) => {
  *
  * toSlateOps(events: Y.YEvent[]): Operation[]
  */
-const toSlateOps = (events) => _.flatten(events.map(toSlateOp));
-
-module.exports = { toSlateOps, toSlateOp };
+export const toSlateOps = (events: Y.YEvent[]): SlateOperation[] =>
+    _.flatten(events.map(toSlateOp));

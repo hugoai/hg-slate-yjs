@@ -1,9 +1,11 @@
-const node = require('./node');
-const text = require('./text');
-const value = require('./value');
-const mark = require('./mark');
+import { SyncDoc, SlateOperation } from 'types';
 
-const nullOp = (doc) => doc;
+import node from './node';
+import text from './text';
+import value from './value';
+import mark from './mark';
+
+const nullOp = (doc: SyncDoc) => doc;
 
 const opMappers = {
     ...text,
@@ -18,9 +20,9 @@ const opMappers = {
 /**
  * Applies a slate operation to a SyncDoc
  *
- * applySlateOp(doc: SyncDoc, op: Operation): SyncDoc
+ * applySlateOp(doc: SyncDoc, op: SlateOperation): SyncDoc
  */
-const applySlateOp = (doc, op) => {
+export const applySlateOp = (doc: SyncDoc, op: SlateOperation): SyncDoc => {
     try {
         const apply = opMappers[op.type];
         if (!apply) {
@@ -41,6 +43,5 @@ const applySlateOp = (doc, op) => {
  *
  * applySlateOps(doc: SyncDoc, operations: Operation[]): SyncDoc
  */
-const applySlateOps = (doc, operations) => operations.reduce(applySlateOp, doc);
-
-module.exports = { applySlateOp, applySlateOps };
+export const applySlateOps = (doc: SyncDoc, operations: SlateOperation[]): SyncDoc =>
+    operations.reduce(applySlateOp, doc);

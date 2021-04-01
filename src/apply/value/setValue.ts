@@ -1,6 +1,7 @@
-const Y = require('yjs');
+import * as Y from 'yjs';
+import { SyncDoc, SlateOperation } from 'types';
 
-const setValue = (doc, op) => {
+const setValue = (doc: SyncDoc, op: SlateOperation): SyncDoc => {
     if (op.properties && op.properties.data) {
         const newData = new Y.Map();
         for (const [key, value] of Object.entries(op.properties.data.toJSON())) {
@@ -12,4 +13,4 @@ const setValue = (doc, op) => {
     return doc;
 };
 
-module.exports = setValue;
+export default setValue;

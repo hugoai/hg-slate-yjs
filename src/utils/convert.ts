@@ -1,18 +1,21 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-extra-boolean-cast */
 /* eslint-disable valid-jsdoc */
-const { Block, Document, Inline, Leaf, Mark, Text, Value } = require('slate');
-const Y = require('yjs');
-const { SyncElement } = require('../model');
+import { AttributeMap, Delta } from 'delta.interface';
+import { Block, Document, Inline, Leaf, Mark, Text, Value, Node } from 'slate';
+import { SyncDoc, SyncArray, SlatePath } from 'types';
+import * as Y from 'yjs';
+import { SyncElement } from '../model';
+import { MarkAttrs } from '../types/mark.interface';
 
 /**
  * Converts a Yjs formatting attributes key to the corresponding slate Mark
  *
  * toSlateMark(string): Mark
  */
-const toSlateMark = (formattingAttributesKey) => {
+export const toSlateMark = (formattingAttributesKey: string): Mark => {
     const s = formattingAttributesKey.split(':');
-    let markAttrs = { type: s[0] };
+    let markAttrs: MarkAttrs = { type: s[0] };
     if (s.length > 1) {
         markAttrs = { data: { value: s[1] }, ...markAttrs };
     }
@@ -24,8 +27,8 @@ const toSlateMark = (formattingAttributesKey) => {
  *
  * toSlateMarks(Object<string, string>): Mark[]
  */
-const toSlateMarks = (formattingAttributes) => {
-    const marks = [];
+export const toSlateMarks = (formattingAttributes: AttributeMap | undefined): Mark[] => {
+    const marks: Mark[] = [];
     if (!!formattingAttributes) {
         for (const formattingAttributesKey in formattingAttributes) {
             marks.push(toSlateMark(formattingAttributesKey));
@@ -39,7 +42,7 @@ const toSlateMarks = (formattingAttributes) => {
  *
  * toSlateLeaf(delta): Leaf
  */
-const toSlateLeaf = (delta) => {
+const toSlateLeaf = (delta: Delta): Leaf => {
     if (!delta.insert) {
         throw new Error(`Unable to convert '${delta}' element`);
     }
@@ -53,9 +56,9 @@ const toSlateLeaf = (delta) => {
 /**
  * Converts a sync element to a slate node
  *
- * toSlateNode(element: SyncElement): Node
+ * toSlateNode(element: SyncDoc): Node
  */
-const toSlateNode = (element) => {
+export const toSlateNode = (element: SyncDoc): Node => {
     let attrs = {};
     for (const [key, value] of element.entries()) {
         if (key !== 'children' && key !== 'text' && key !== 'marks') {
@@ -67,21 +70,21 @@ const toSlateNode = (element) => {
     if (object === 'block') {
         const children = SyncElement.getChildren(element);
         attrs = {
-            nodes: children.map(toSlateNode),
+            nodes: children && children.map(toSlateNode),
             ...attrs,
         };
         return Block.create(attrs);
     } else if (object === 'inline') {
         const children = SyncElement.getChildren(element);
         attrs = {
-            nodes: children.map(toSlateNode),
+            nodes: children && children.map(toSlateNode),
             ...attrs,
         };
         return Inline.create(attrs);
     } else if (object === 'text') {
         const text = SyncElement.getText(element);
         attrs = {
-            leaves: text.toDelta().map(toSlateLeaf),
+            leaves: text && text.toDelta().map(toSlateLeaf),
             ...attrs,
         };
         return Text.create(attrs);
@@ -93,10 +96,10 @@ const toSlateNode = (element) => {
 /**
  * Converts a SyncDoc to a Slate doc
  *
- * toSlateDoc(syncDoc: SyncDoc): Node[]
+ * toSlateDoc(syncDoc: SyncDoc): Value
  */
-const toSlateDoc = (syncDoc) => {
-    const documentNodes = syncDoc.get('document') || [];
+export const toSlateDoc = (syncDoc: SyncDoc): Value => {
+    const documentNodes: SyncArray = syncDoc.get('document') || [];
     const nodes = documentNodes.map(toSlateNode);
     const document = Document.create({ nodes });
     const data = syncDoc.get('data');
@@ -109,9 +112,9 @@ const toSlateDoc = (syncDoc) => {
  *
  * toFormattingAttributesKey(Mark): string
  */
-const toFormattingAttributesKey = (mark) => {
+export const toFormattingAttributesKey = (mark: Mark): string => {
     let key = mark.type;
-    if (mark.data && mark.data.has('value')) {
+    if (mark.data !== undefined && mark.data.has('value')) {
         key = `${key}:${mark.data.get('value')}`;
     }
     return key;
@@ -122,8 +125,11 @@ const toFormattingAttributesKey = (mark) => {
  *
  * toFormattingAttributes(List<Mark>, boolean): Object<string, string>
  */
-const toFormattingAttributes = (marks, setMark = true) => {
-    const result = {};
+export const toFormattingAttributes = (
+    marks: Mark[],
+    setMark = true
+): Record<string, string | null> => {
+    const result: Record<string, string | null> = {};
     marks.forEach((mark) => {
         // If setMark is false, use a value of null to indicate that application of
         // the resulting formatting attributes should cause the mark to be cleared.
@@ -135,9 +141,9 @@ const toFormattingAttributes = (marks, setMark = true) => {
 /**
  * Converts a slate node to a sync element
  *
- * toSyncElement(node: Node): SyncElement
+ * toSyncElement(node: Node): SyncDoc
  */
-const toSyncElement = (node) => {
+export const toSyncElement = (node: Node): SyncDoc => {
     const element = new Y.Map();
 
     if (Block.isBlock(node) || Inline.isInline(node)) {
@@ -151,7 +157,7 @@ const toSyncElement = (node) => {
         const textElement = new Y.Text(node.text);
         element.set('text', textElement);
         let index = 0;
-        node.getLeaves().forEach((leaf) => {
+        node.getLeaves().forEach((leaf: Leaf) => {
             if (leaf.marks.size > 0) {
                 textElement.format(index, leaf.text.length, toFormattingAttributes(leaf.marks));
             }
@@ -174,7 +180,7 @@ const toSyncElement = (node) => {
  *
  * toSyncDoc(syncDoc: SyncDoc, value: Value): void
  */
-const toSyncDoc = (syncDoc, value) => {
+export const toSyncDoc = (syncDoc: SyncDoc, value: Value): void => {
     const document = new Y.Array();
     document.insert(0, value.document.nodes.map(toSyncElement));
     syncDoc.set('document', document);
@@ -186,15 +192,5 @@ const toSyncDoc = (syncDoc, value) => {
  *
  * toSlatePath(path: (string | number)[]): Path
  */
-const toSlatePath = (path) => path.filter((node) => typeof node === 'number');
-
-module.exports = {
-    toFormattingAttributes,
-    toFormattingAttributesKey,
-    toSlateMarks,
-    toSlateNode,
-    toSlateDoc,
-    toSyncDoc,
-    toSyncElement,
-    toSlatePath,
-};
+export const toSlatePath = (path: SlatePath): SlatePath =>
+    path.filter((node) => typeof node === 'number');

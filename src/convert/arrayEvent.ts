@@ -1,18 +1,20 @@
-const { Block } = require('slate');
-const { toSlateNode, toSlatePath } = require('../utils/convert');
-
+import { NodeOperation } from 'node.interface';
+import { Block } from 'slate';
+import { SyncDoc } from 'types';
+import * as Y from 'yjs';
+import { toSlateNode, toSlatePath } from '../utils/convert';
 /**
  * Converts a Yjs Array event into Slate operations.
  *
  * arrayEvent(event: Y.YArrayEvent<SyncElement>): NodeOperation[]
  */
-const arrayEvent = (event) => {
+const arrayEvent = (event: Y.YArrayEvent<SyncDoc>): NodeOperation[] => {
     const eventTargetPath = toSlatePath(event.path);
 
     /**
      * createRemoveNode(index: number): NodeOperation
      */
-    const createRemoveNode = (index) => {
+    const createRemoveNode = (index: number): NodeOperation => {
         const path = [...eventTargetPath, index];
         // Although we may be removing something other than a Block node (e.g., Text
         // or Inline), slate doesn't seem to care if we always pass a Block node
@@ -24,7 +26,7 @@ const arrayEvent = (event) => {
     /**
      * createInsertNode(index: number, element: SyncElement): NodeOperation
      */
-    const createInsertNode = (index, element) => {
+    const createInsertNode = (index: number, element: SyncDoc): NodeOperation => {
         const path = [...eventTargetPath, index];
         const node = toSlateNode(element);
         return { type: 'insert_node', path, node };
@@ -34,20 +36,23 @@ const arrayEvent = (event) => {
 
     let removeIndex = 0;
     let addIndex = 0;
-    let removeOps = [];
-    let addOps = [];
+    let removeOps: NodeOperation[] = [];
+    let addOps: NodeOperation[] = [];
     for (const delta of event.changes.delta) {
         const d = delta;
-        if (d.retain !== undefined) {
-            removeIndex += d.retain;
-            addIndex += d.retain;
-        } else if (d.delete !== undefined) {
-            for (let i = 0; i < d.delete; i += 1) {
+        if (d['retain'] !== undefined) {
+            removeIndex += d['retain'];
+            addIndex += d['retain'];
+        } else if (d['delete'] !== undefined) {
+            for (let i = 0; i < d['delete']; i += 1) {
                 removeOps.push(createRemoveNode(removeIndex));
             }
-        } else if (d.insert !== undefined) {
-            addOps = addOps.concat(d.insert.map((e, i) => createInsertNode(addIndex + i, e)));
-            addIndex += d.insert.length;
+        } else if (d['insert'] !== undefined) {
+            addOps = addOps.concat(
+                // eslint-disable-next-line @typescript-eslint/no-loop-func
+                d['insert'].map((e: SyncDoc, i: number) => createInsertNode(addIndex + i, e))
+            );
+            addIndex += d['insert'].length;
         }
     }
 
@@ -57,4 +62,4 @@ const arrayEvent = (event) => {
     return [...removeOps, ...addOps];
 };
 
-module.exports = arrayEvent;
+export default arrayEvent;

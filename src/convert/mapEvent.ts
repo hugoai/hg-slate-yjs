@@ -1,6 +1,8 @@
-const Y = require('yjs');
-const { toSlatePath, toSlateNode } = require('../utils/convert');
-
+import { NodeOperation, SetNodeOperation } from 'node.interface';
+import * as Y from 'yjs';
+import { Block } from 'slate';
+import { SlateOperation, SyncDoc } from 'types';
+import { toSlatePath, toSlateNode } from '../utils/convert';
 /**
  * Extracts insert_node operations from a Yjs Map event.
  * This is only needed when the initial state is constructed as when Yjs populates the document
@@ -11,18 +13,18 @@ const { toSlatePath, toSlateNode } = require('../utils/convert');
  * handled by arrayEvent.js.
  * mapInsertNodeOperations(event: Y.YMapEvent<any>): InsertNodeOperation[]
  */
-const mapInsertNodeOperations = (event) => {
+const mapInsertNodeOperations = (event: Y.YMapEvent<any>) => {
     const changesKeys = Array.from(event.changes.keys.entries());
-    const operations = [];
+    const operations: NodeOperation[] = [];
     changesKeys.forEach(([key, meta]) => {
         if (key === 'document' && meta.action !== 'add') {
-            throw new Error('Unsupported Yjs event: ', event.toJSON());
+            throw new Error(`Unsupported Yjs event:  ${event.target.toJSON()}`);
         }
 
         if (key === 'document') {
             let index = 0;
-            const documentNodes = event.target.get(key).map(toSlateNode);
-            documentNodes.forEach((block) => {
+            const documentNodes = ((event.target as any) as SyncDoc).get(key).map(toSlateNode);
+            documentNodes.forEach((block: Block) => {
                 operations.push({
                     type: 'insert_node',
                     path: [index],
@@ -39,12 +41,12 @@ const mapInsertNodeOperations = (event) => {
  * Extracts set_value or set_node operations from a Yjs Map event.
  * mapInsertNodeOperations(event: Y.YMapEvent<any>): Operation[]
  */
-const mapSetValueOrSetNodeOperations = (event) => {
+const mapSetValueOrSetNodeOperations = (event: Y.YMapEvent<any>): SlateOperation[] => {
     /**
      * convertChildToSlate(targetElement: event.target, key: string): json | string
      */
-    const convertChildToSlate = (targetElement, key) => {
-        const element = targetElement.get(key);
+    const convertChildToSlate = (targetElement: Y.AbstractType<any>, key: string) => {
+        const element = ((targetElement as any) as SyncDoc).get(key);
         if (element instanceof Y.Map || element instanceof Y.Array || element instanceof Y.Text) {
             return element.toJSON();
         }
@@ -54,8 +56,8 @@ const mapSetValueOrSetNodeOperations = (event) => {
     /**
      * convertMapOp(actionEntry: [string, MapAction]): SetNodeOperationProperties
      */
-    const convertMapOp = (actionEntry) => {
-        // eslint-disable-next-line no-unused-vars
+    const convertMapOp = (actionEntry: [string, any]) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const [key, action] = actionEntry;
         const targetElement = event.target;
         return {
@@ -66,7 +68,7 @@ const mapSetValueOrSetNodeOperations = (event) => {
     /**
      * combineMapOp(op: SetNodeOperation, props: SetNodeOperationProperties): SetNodeOperation
      */
-    const combineMapOp = (op, props) => ({
+    const combineMapOp = (op: SetNodeOperation, props) => ({
         ...op,
         newProperties: { ...op.newProperties, ...props.newProperties },
         properties: { ...op.properties, ...props.properties },
@@ -74,7 +76,7 @@ const mapSetValueOrSetNodeOperations = (event) => {
 
     const keys = event.changes.keys;
     const changes = Array.from(keys.entries(), convertMapOp);
-    let mapOperations = [];
+    let mapOperations: SetNodeOperation[] = [];
 
     const isSetValueOperation = keys.has('data') && event.path.length === 0;
     const isSetNodeOperation = keys.has('data') && event.path.length !== 1;
@@ -95,11 +97,11 @@ const mapSetValueOrSetNodeOperations = (event) => {
  *
  * mapEvent(event: Y.YMapEvent<any>): Operation[]
  */
-const mapEvent = (event) => {
+const mapEvent = (event: Y.YMapEvent<any>): SlateOperation[] => {
     const insertNodeOperations = mapInsertNodeOperations(event);
     const setValueOrSetNodeOperations = mapSetValueOrSetNodeOperations(event);
 
     return [...insertNodeOperations, ...setValueOrSetNodeOperations];
 };
 
-module.exports = mapEvent;
+export default mapEvent;

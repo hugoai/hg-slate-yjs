@@ -1,13 +1,16 @@
 /* eslint-disable no-extra-boolean-cast */
-const Y = require('yjs');
-const { toFormattingAttributesKey, toSlateMarks, toSlatePath } = require('../utils/convert');
+import { MarkAttrs, MarkOperation } from 'mark.interface';
+import { TextOperation } from 'text.interface';
+import { TextEventOp } from 'types';
+import * as Y from 'yjs';
+import { toFormattingAttributesKey, toSlateMarks, toSlatePath } from '../utils/convert';
 
 /**
  * Converts a Yjs Text event into Slate operations.
  *
- * textEvent(event: Y.YTextEvent): TextOperation[]
+ * textEvent(event: Y.YTextEvent): TextEventOp[]
  */
-const textEvent = (event) => {
+const textEvent = (event: Y.YTextEvent): TextEventOp[] => {
     const eventTargetPath = toSlatePath(event.path);
 
     /**
@@ -15,9 +18,14 @@ const textEvent = (event) => {
      *   type: 'insert_text'|'remove_text',
      *   offset: number,
      *   text: string,
-     *   marks: Mark[]): TextOperation
+     *   marks: SlateMark[]): TextOperation
      */
-    const createTextOp = (type, offset, text, marks = []) => ({
+    const createTextOp = (
+        type: 'insert_text' | 'remove_text',
+        offset: number,
+        text: string,
+        marks: MarkAttrs[] = []
+    ): TextOperation => ({
         type,
         offset,
         text,
@@ -31,7 +39,11 @@ const textEvent = (event) => {
      *   length: number,
      *   attributes: Object<string, string>): MarkOperation[]
      */
-    const createMarkOps = (offset, length, attributes) =>
+    const createMarkOps = (
+        offset: number,
+        length: number,
+        attributes: MarkAttrs
+    ): MarkOperation[] =>
         toSlateMarks(attributes).map((mark) => ({
             type: attributes[toFormattingAttributesKey(mark)] !== null ? 'add_mark' : 'remove_mark',
             path: eventTargetPath,
@@ -43,16 +55,18 @@ const textEvent = (event) => {
     const removedValues = event.changes.deleted.values();
     let removeOffset = 0;
     let addOffset = 0;
-    const removeOps = [];
-    const addOps = [];
-    const markOps = [];
+    const removeOps: TextOperation[] = [];
+    const addOps: TextOperation[] = [];
+    const markOps: MarkOperation[] = [];
     for (const delta of event.delta) {
         const d = delta;
         if (d.retain !== undefined) {
             if (!!d.attributes) {
-                createMarkOps(addOffset, d.retain, d.attributes).forEach((markOp) => {
-                    markOps.push(markOp);
-                });
+                createMarkOps(addOffset, d.retain, d.attributes as MarkAttrs).forEach(
+                    (markOp: MarkOperation): void => {
+                        markOps.push(markOp);
+                    }
+                );
             }
             removeOffset += d.retain;
             addOffset += d.retain;
@@ -83,4 +97,4 @@ const textEvent = (event) => {
     return [...removeOps, ...addOps, ...markOps];
 };
 
-module.exports = textEvent;
+export default textEvent;
