@@ -8,7 +8,7 @@
     "yjs",
     "y-websocket"
   ],
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "module": "dist",
   "files": [
     "src"
