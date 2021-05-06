@@ -48,11 +48,14 @@ const arrayEvent = (event: Y.YArrayEvent<SyncDoc>): NodeOperation[] => {
                 removeOps.push(createRemoveNode(removeIndex));
             }
         } else if (d['insert'] !== undefined) {
-            addOps = addOps.concat(
-                // eslint-disable-next-line @typescript-eslint/no-loop-func
-                d['insert'].map((e: SyncDoc, i: number) => createInsertNode(addIndex + i, e))
-            );
-            addIndex += d['insert'].length;
+            const elements = d['insert'] as SyncDoc[];
+            if (elements) {
+                addOps = addOps.concat(
+                    // eslint-disable-next-line @typescript-eslint/no-loop-func
+                    elements.map((e: SyncDoc, i: number) => createInsertNode(addIndex + i, e))
+                );
+                addIndex += elements.length;
+            }
         }
     }
 
