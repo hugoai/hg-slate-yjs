@@ -72,21 +72,17 @@ const textEvent = (event: Y.YTextEvent): TextEventOp[] => {
             addOffset += d.retain;
         } else if (d.delete !== undefined) {
             let text = '';
-            while (text.length < d.delete) {
-                const item = removedValues.next().value;
-                const { content } = item;
-
-                // Skip deleted items that don't contain text (e.g., some only contain
-                // formatting attributes).
-                if (content && content instanceof Y.ContentString) {
-                    text = text.concat(content.str);
-                }
+            for (let index = 0; index < d.delete; index++) {
+                // Yjs doesn't expose the portion of the string that was removed and Slate only
+                // uses it to get the length of the substring that is going to be removed.
+                // This populates the substring with dummy text making the lengths match.
+                text += '0';
             }
             if (text.length !== d.delete) {
                 throw new Error(`Unexpected length: expected ${d.delete}, got ${text.length}`);
             }
             removeOps.push(createTextOp('remove_text', removeOffset, text));
-        } else if (d.insert !== undefined) {
+        } else if (d.insert !== undefined && typeof d.insert == 'string') {
             addOps.push(
                 createTextOp('insert_text', addOffset, d.insert, toSlateMarks(d.attributes))
             );

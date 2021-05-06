@@ -65,7 +65,7 @@
     "ts-jest": "^26.5.3",
     "ts-node": "9.0.0",
     "typescript": "^4.2.3",
-    "yjs": "13.4.9"
+    "yjs": "^13.5.5"
   },
   "dependencies": {
     "immutable": "^3.8.2",
