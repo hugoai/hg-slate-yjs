@@ -1,6 +1,7 @@
 {
   "name": "hg-slate-yjs",
-  "version": "0.1.6",
+  "sideEffects": false,
+  "version": "3.1.1",
   "description": "Yjs bindings for Slate.",
   "keywords": [
     "slate",
@@ -8,86 +9,87 @@
     "yjs",
     "y-websocket"
   ],
-  "main": "dist/index.js",
-  "module": "dist",
+  "main": "dist/main/index.js",
+  "typings": "dist/main/index.d.ts",
+  "module": "dist/module/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/module/index.js",
+      "require": "./dist/main/index.js"
+    }
+  },
   "files": [
-    "src"
+    "dist"
   ],
   "author": "Eric Meier <eric@barbra.io>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hugoai/hg-slate-yjs.git"
+    "url": "https://github.com/BitPhinix/slate-yjs.git"
   },
   "license": "MIT",
   "engines": {
     "node": ">=6.0.0"
   },
   "scripts": {
-    "lint": "eslint ./src/**/*.{js,ts}",
-    "test-lint": "eslint ./test/**/*.{js,ts}",
-    "fix": "eslint ./src/**/*.{js,ts} --fix",
-    "test-fix": "eslint ./test/**/*.{js,ts} --fix",
-    "test": "jest --coverage",
-    "test:watch": "jest --coverage --watch",
-    "prepare": "husky install",
-    "build": "tsc"
+    "lint": "eslint ./test/**/*.ts ./src/**/*.ts --quiet",
+    "fix": "eslint ./test/**/*.ts ./src/**/*.ts --quiet --fix",
+    "build": "rimraf dist && npm run build:main & npm run build:module",
+    "build:main": "tsc -p tsconfig.json",
+    "build:module": "tsc -p tsconfig.module.json",
+    "test": "jest --forceExit --coverage",
+    "test:watch": "jest --forceExit --coverage --watch",
+    "semantic-release": "semantic-release",
+    "commit": "cz"
   },
   "devDependencies": {
-    "@babel/core": "^7.9.0",
-    "@babel/preset-env": "^7.9.0",
-    "@babel/preset-react": "^7.9.0",
-    "@commitlint/cli": "^12.0.1",
-    "@commitlint/config-conventional": "^12.0.1",
-    "@types/jest": "26.0.15",
-    "@types/lodash": "4.14.164",
-    "@types/node": "10.17.44",
-    "@types/shelljs": "0.8.8",
-    "@typescript-eslint/eslint-plugin": "^4.16.1",
-    "@typescript-eslint/parser": "^4.16.1",
-    "babel-eslint": "^10.1.0",
-    "babel-jest": "^25.1.0",
-    "babel-loader": "^8.0.6",
-    "eslint": "^7.21.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-config-airbnb-typescript": "^12.3.1",
-    "eslint-config-prettier": "^7.2.0",
-    "eslint-plugin-import": "^2.22.1",
-    "eslint-plugin-jest": "^24.1.3",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-prettier": "^3.3.1",
-    "esrever": "0.2.0",
-    "husky": "^5.1.3",
-    "jest": "26.6.3",
-    "jest-config": "26.6.3",
-    "prettier": "^2.2.1",
-    "rimraf": "3.0.2",
-    "slate-hyperscript": "^0.10.8",
-    "ts-jest": "^26.5.3",
-    "ts-node": "9.0.0",
-    "typescript": "^4.2.3",
-    "yjs": "^13.5.5"
+    "@commitlint/cli": "^12.1.4",
+    "@commitlint/config-conventional": "^12.1.4",
+    "@semantic-release/git": "^9.0.0",
+    "@types/jest": "^26.0.23",
+    "@types/react": "^17.0.13",
+    "@typescript-eslint/eslint-plugin": "^4.28.1",
+    "@typescript-eslint/parser": "^4.28.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^7.30.0",
+    "eslint-config-airbnb-typescript-prettier": "^4.2.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "husky": "^5.2.0",
+    "jest": "^26.6.3",
+    "jest-config": "^26.6.3",
+    "prettier": "^2.3.2",
+    "react": "^17.0.2",
+    "rimraf": "^3.0.2",
+    "semantic-release": "^17.4.4",
+    "slate": "~0.59.0",
+    "ts-jest": "^26.5.6",
+    "ts-node": "^9.1.0",
+    "typescript": "^4.3.5",
+    "yjs": "^13.5.11"
   },
   "dependencies": {
-    "immutable": "^3.8.2",
-    "lodash": "^4.17.19",
-    "react": "^16.9.0",
-    "slate": "https://registry.npmjs.org/@hugo-team/slate/-/slate-0.41.6.tgz",
-    "y-protocols": "^1.0.1",
-    "y-websocket": "^1.3.2"
+    "tiny-invariant": "1.1.0",
+    "y-protocols": "^1.0.5"
   },
   "peerDependencies": {
-    "yjs": "13.4.9"
+    "react": ">=16.8.0",
+    "slate": "^0.59.0",
+    "yjs": "^13.5.4"
   },
-  "babel": {
-    "presets": [
-      "@babel/preset-env",
-      "@babel/preset-react"
-    ]
+  "bugs": {
+    "url": "https://github.com/BitPhinix/slate-yjs/issues"
   },
-  "homepage": "https://github.com/hugoai/hg-slate-yjs#readme",
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
+  "homepage": "https://github.com/BitPhinix/slate-yjs#readme",
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint test",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
+    }
   }
 }

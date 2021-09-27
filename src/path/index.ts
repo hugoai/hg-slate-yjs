@@ -1,94 +1,96 @@
-/* eslint-disable @typescript-eslint/dot-notation */
-import { SyncDoc, SlatePath, SyncNodeType } from 'types';
+import { Path } from 'slate';
+import invariant from 'tiny-invariant';
 import * as Y from 'yjs';
-import { SyncNode } from '../model';
+import { SharedType, SyncElement, SyncNode } from '../model';
+import { toSlateDoc } from '../utils/convert';
+
+const isTree = (node: SyncNode): boolean => !!SyncNode.getChildren(node);
 
 /**
  * Returns the SyncNode referenced by the path
  *
- * getTarget(doc: SyncDoc, path: Path): SyncDoc | undefined
+ * @param doc
+ * @param path
  */
-export const getTarget = (doc: SyncDoc, path: SlatePath): SyncDoc | undefined => {
-    /**
-     * iterate(current: SyncDoc, idx: number): SyncDoc
-     */
-    const iterate = (current?: SyncDoc, idx?: number): SyncDoc => {
-        let result: SyncDoc | undefined;
-        const children = SyncNode.getChildren(current);
-        if (children !== undefined && idx !== undefined) {
-            result = children.get(idx);
-        }
-        if (result === undefined) {
-            throw new TypeError(
-                `path ${path.toString()} does not match doc ${JSON.stringify(doc)}`
-            );
-        }
-        return result;
-    };
+export function getTarget(doc: SharedType, path: Path): SyncNode {
+  function iterate(current: SyncNode, idx: number) {
+    const children = SyncNode.getChildren(current);
 
-    return path.reduce(iterate, doc);
-};
-
-/**
- * getParentPath(path: Path, level = 1): [number, Path]
- */
-export const getParentPath = (path: SlatePath, level = 1): [number, SlatePath] => {
-    if (level > path.size) {
-        throw new TypeError('requested ancestor is higher than root');
+    if (!isTree(current) || !children?.get(idx)) {
+      throw new TypeError(
+        `path ${path.toString()} does not match doc ${JSON.stringify(
+          toSlateDoc(doc)
+        )}`
+      );
     }
 
-    return [path.get(path.size - level), path.slice(0, path.size - level)];
-};
+    return children.get(idx);
+  }
 
-/**
- * getParent(doc: SyncDoc, path: Path, level = 1): [SyncDoc | undefined, number]
- */
-export const getParent = (
-    doc: SyncDoc,
-    path: SlatePath,
-    level = 1
-): [SyncNodeType | undefined, number] => {
-    const [idx, parentPath] = getParentPath(path, level);
-    return [getTarget(doc, parentPath), idx];
-};
+  return path.reduce<SyncNode>(iterate, doc);
+}
+
+function getParentPath(path: Path, level = 1): [number, Path] {
+  if (level > path.length) {
+    throw new TypeError('requested ancestor is higher than root');
+  }
+
+  return [path[path.length - level], path.slice(0, path.length - level)];
+}
+
+export function getParent(
+  doc: SharedType,
+  path: Path,
+  level = 1
+): [SyncNode, number] {
+  const [idx, parentPath] = getParentPath(path, level);
+  const parent = getTarget(doc, parentPath);
+  invariant(parent, 'Parent node should exists');
+  return [parent, idx];
+}
 
 /**
  * Returns the position of the sync item inside inside it's parent array.
  *
- * getArrayPosition(item: Y.Item): number
+ * @param item
  */
-export const getArrayPosition = (item: Y.Item): number => {
-    let i = 0;
-    if (item.parent) {
-        let c = item.parent['_start'];
-        while (c !== item && c !== null) {
-            if (!c.deleted) {
-                i++;
-            }
-            c = c.right;
-        }
+export function getArrayPosition(item: Y.Item): number {
+  let i = 0;
+  let c = (item.parent as Y.Array<SyncElement>)._start;
+
+  while (c !== item && c !== null) {
+    if (!c.deleted) {
+      i += 1;
     }
-    return i;
-};
+    c = c.right;
+  }
+
+  return i;
+}
 
 /**
  * Returns the document path of a sync item
  *
- * getSyncItemPath(item: Y.Item): Path
+ * @param node
  */
-export const getSyncItemPath = (item: Y.Item | null): SlatePath => {
-    if (!item) {
-        return [];
-    }
+export function getSyncNodePath(node: SyncNode): Path {
+  if (!node) {
+    return [];
+  }
 
-    const parent = item.parent;
-    if (parent instanceof Y.Array) {
-        return [...getSyncItemPath(parent._item), getArrayPosition(item)];
-    }
+  const { parent } = node;
+  if (!parent) {
+    return [];
+  }
 
-    if (parent instanceof Y.Map) {
-        return getSyncItemPath(parent._item);
-    }
+  if (parent instanceof Y.Array) {
+    invariant(node._item, 'Parent should be associated with a item');
+    return [...getSyncNodePath(parent), getArrayPosition(node._item)];
+  }
 
-    throw new Error(`Unknown parent type ${parent}`);
-};
+  if (parent instanceof Y.Map) {
+    return getSyncNodePath(parent);
+  }
+
+  throw new Error(`Unknown parent type ${parent}`);
+}
