@@ -1,0 +1,7 @@
+import { applyYjsEvents, translateYjsEvent } from './applyToSlate';
+import applySlateOps, { applySlateOp } from './applyToYjs';
+import { SyncElement, SyncNode } from './model';
+import { CursorEditor, useCursors, withCursor, withYjs, YjsEditor, } from './plugin';
+import { toSharedType, toSlateDoc, toSyncElement, toSyncDoc } from './utils';
+export { CursorEditor, SyncElement, SyncNode, useCursors, withCursor, withYjs, YjsEditor, toSharedType, toSlateDoc, toSyncElement, translateYjsEvent, applyYjsEvents, applySlateOps, applySlateOp, toSyncDoc, };
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi9zcmMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsT0FBTyxFQUFFLGNBQWMsRUFBRSxpQkFBaUIsRUFBRSxNQUFNLGdCQUFnQixDQUFDO0FBQ25FLE9BQU8sYUFBYSxFQUFFLEVBQUUsWUFBWSxFQUFFLE1BQU0sY0FBYyxDQUFDO0FBQzNELE9BQU8sRUFBYyxXQUFXLEVBQUUsUUFBUSxFQUFFLE1BQU0sU0FBUyxDQUFDO0FBQzVELE9BQU8sRUFDTCxZQUFZLEVBQ1osVUFBVSxFQUNWLFVBQVUsRUFDVixPQUFPLEVBRVAsU0FBUyxHQUNWLE1BQU0sVUFBVSxDQUFDO0FBQ2xCLE9BQU8sRUFBRSxZQUFZLEVBQUUsVUFBVSxFQUFFLGFBQWEsRUFBRSxTQUFTLEVBQUUsTUFBTSxTQUFTLENBQUM7QUFFN0UsT0FBTyxFQUVMLFlBQVksRUFDWixXQUFXLEVBQ1gsUUFBUSxFQUNSLFVBQVUsRUFDVixVQUFVLEVBQ1YsT0FBTyxFQUVQLFNBQVMsRUFDVCxZQUFZLEVBQ1osVUFBVSxFQUNWLGFBQWEsRUFDYixpQkFBaUIsRUFDakIsY0FBYyxFQUNkLGFBQWEsRUFDYixZQUFZLEVBQ1osU0FBUyxHQUNWLENBQUMifQ==
