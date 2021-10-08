@@ -27,10 +27,11 @@ export default function translateMapEvent(
   const properties = Object.fromEntries(
     keyChanges.map(([key]) => [key, targetElement[key]])
   );
+  const documentChanges = keyChanges.find((change) => change[0] === 'document');
   if (
-    Object.keys(keyChanges).length === 1 &&
-    keyChanges[0][0] === 'document' &&
-    keyChanges[0][1].action === 'add'
+    event.path.length === 0 &&
+    documentChanges &&
+    documentChanges[1].action === 'add'
   ) {
     const operations: NodeOperation[] = [];
     const nodes = newProperties.document.toJSON() as Node[];

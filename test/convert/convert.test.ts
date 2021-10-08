@@ -89,6 +89,8 @@ describe('convert', () => {
     });
 
     const value = {
+      object: 'value',
+      data: { actions: [{ id: 'test' }] },
       document: [
         createNode('paragraph', 'Line 1'),
         {
