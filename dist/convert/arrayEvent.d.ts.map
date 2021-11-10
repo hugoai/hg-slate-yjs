@@ -1,1 +1,0 @@
-{"version":3,"file":"arrayEvent.d.ts","sourceRoot":"","sources":["../../src/convert/arrayEvent.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,aAAa,EAAE,MAAM,gBAAgB,CAAC;AAE/C,OAAO,EAAE,OAAO,EAAE,MAAM,OAAO,CAAC;AAChC,OAAO,KAAK,CAAC,MAAM,KAAK,CAAC;AAEzB;;;;GAIG;AACH,QAAA,MAAM,UAAU,UAAW,EAAE,WAAW,CAAC,OAAO,CAAC,KAAG,aAAa,EAuDhE,CAAC;AAEF,eAAe,UAAU,CAAC"}
