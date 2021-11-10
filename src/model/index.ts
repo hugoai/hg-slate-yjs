@@ -1,41 +1,43 @@
-import { SyncDoc, SyncArray, SyncNodeType } from 'types';
+import { Range } from 'slate';
 import * as Y from 'yjs';
 
-export const SyncElement = {
-    /**
-     * getText(element: SyncDoc): Y.Text | undefined
-     */
-    getText(element?: SyncDoc): Y.Text | undefined {
-        return element !== undefined && element.get('text');
-    },
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type SyncElement = Y.Map<any>;
+export type SharedType = Y.Array<SyncElement>;
+export type SyncNode = SharedType | SyncElement;
 
-    /**
-     * getChildren(element: SyncDoc): SyncArray | undefined
-     */
-    getChildren(element?: SyncDoc): SyncArray | undefined {
-        return element !== undefined && element.get('children');
-    },
+export const slateYjsSymbol = Symbol('slate-yjs');
+
+export interface Cursor extends Range {
+  data: {
+    [key: string]: unknown;
+  };
+}
+
+export const SyncElement = {
+  getText(element: SyncElement): Y.Text | undefined {
+    return element?.get('text');
+  },
+
+  getChildren(element: SyncElement): Y.Array<SyncElement> | undefined {
+    return element?.get('children');
+  },
 };
 
 export const SyncNode = {
-    /**
-     * getChildren(node: SyncNodeType): SyncArray | undefined
-     */
-    getChildren(node?: SyncNodeType): SyncArray | undefined {
-        if (node !== undefined && node instanceof Y.Array) {
-            return node;
-        }
-        return SyncElement.getChildren(node);
-    },
+  getChildren(node: SyncNode): Y.Array<SyncElement> | undefined {
+    if (node instanceof Y.Array) {
+      return node;
+    }
 
-    /**
-     * getText(node: SyncNodeType): Y.Text | undefined
-     */
-    getText(node?: SyncNodeType): Y.Text | undefined {
-        if (node !== undefined && node instanceof Y.Array) {
-            return undefined;
-        }
+    return SyncElement.getChildren(node);
+  },
 
-        return SyncElement.getText(node);
-    },
+  getText(node: SyncNode): Y.Text | undefined {
+    if (node instanceof Y.Array) {
+      return undefined;
+    }
+
+    return SyncElement.getText(node);
+  },
 };
