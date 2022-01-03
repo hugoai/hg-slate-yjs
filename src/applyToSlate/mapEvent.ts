@@ -45,7 +45,9 @@ export default function translateMapEvent(
 
     return operations;
   }
-  if (keyChanges[0][0] === 'data' && !targetPath.length) {
+
+  // If it's not an operation to insert new Slate nodes and it has no path, it has no use.
+  if (!targetPath.length) {
     return [];
   }
 
