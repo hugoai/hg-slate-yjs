@@ -9,20 +9,17 @@ import translateTextEvent from './textEvent';
  *
  * @param event
  */
-export function translateYjsEvent(
-  editor: Editor,
-  event: Y.YEvent
-): Operation[] {
+export function translateYjsEvent(event: Y.YEvent): Operation[] {
   if (event instanceof Y.YArrayEvent) {
-    return translateArrayEvent(editor, event);
+    return translateArrayEvent(event);
   }
 
   if (event instanceof Y.YMapEvent) {
-    return translateMapEvent(editor, event);
+    return translateMapEvent(event);
   }
 
   if (event instanceof Y.YTextEvent) {
-    return translateTextEvent(editor, event);
+    return translateTextEvent(event);
   }
 
   throw new Error('Unsupported yjs event');
@@ -34,19 +31,15 @@ export function translateYjsEvent(
 export function applyYjsEvents(editor: Editor, events: Y.YEvent[]): void {
   Editor.withoutNormalizing(editor, () => {
     events.forEach((event) =>
-      translateYjsEvent(editor, event).forEach((op) => {
+      translateYjsEvent(event).forEach((op) => {
         editor.apply(op);
       })
     );
   });
 }
 
-export const toSlateOps = (editor: Editor, events: Y.YEvent[]): Operation[] => {
+export const toSlateOps = (events: Y.YEvent[]): Operation[] => {
   const operations: Operation[] = [];
-  Editor.withoutNormalizing(editor, () => {
-    events.forEach((event) =>
-      operations.push(...translateYjsEvent(editor, event))
-    );
-  });
+  events.forEach((event) => operations.push(...translateYjsEvent(event)));
   return operations;
 };

@@ -1,4 +1,4 @@
-import { Editor, Node, Text, TextOperation } from 'slate';
+import { TextOperation } from 'slate';
 import invariant from 'tiny-invariant';
 import * as Y from 'yjs';
 import { toSlatePath } from '../utils/convert';
@@ -9,19 +9,11 @@ import { toSlatePath } from '../utils/convert';
  * @param event
  */
 export default function translateTextEvent(
-  editor: Editor,
   event: Y.YTextEvent
 ): TextOperation[] {
   const targetPath = toSlatePath(event.path);
-  const targetText = Node.get(editor, targetPath);
-
-  invariant(
-    Text.isText(targetText),
-    'Cannot apply text event to non-text node'
-  );
 
   let offset = 0;
-  let { text } = targetText;
   const ops: TextOperation[] = [];
 
   event.changes.delta.forEach((delta) => {
@@ -30,16 +22,21 @@ export default function translateTextEvent(
     }
 
     if ('delete' in delta) {
-      const endOffset = offset + (delta.delete ?? 0);
+      const deleteLength = delta.delete ?? 0;
+      let removalText = '';
+      for (let index = 0; index < deleteLength; index++) {
+        // Yjs doesn't expose the portion of the string that was removed and Slate only
+        // uses it to get the length of the substring that is going to be removed.
+        // This populates the substring with dummy text making the lengths match.
+        removalText += '0';
+      }
 
       ops.push({
         type: 'remove_text',
         offset,
         path: targetPath,
-        text: text.slice(offset, endOffset),
+        text: removalText,
       });
-
-      text = text.slice(0, offset) + text.slice(endOffset);
     }
 
     if ('insert' in delta) {
@@ -56,7 +53,6 @@ export default function translateTextEvent(
       });
 
       offset += delta.insert.length;
-      text = text.slice(0, offset) + delta.insert + text.slice(offset);
     }
   });
 

@@ -1,4 +1,4 @@
-import { createEditor, Node, Operation } from 'slate';
+import { Node, Operation } from 'slate';
 import * as Y from 'yjs';
 import { toSlateDoc, toSyncDoc } from '../../src';
 import { toSlateOps } from '../../src/applyToSlate';
@@ -78,13 +78,11 @@ describe('convert', () => {
   });
 
   it('should create insert_node Slate operations when creating a document', () => {
-    const editor = createEditor();
-
     const doc = new Y.Doc();
     const syncDoc = doc.getMap('content');
     const operations: Operation[] = [];
     syncDoc.observeDeep((events) => {
-      const ops = toSlateOps(editor, events);
+      const ops = toSlateOps(events);
       operations.push(...ops);
     });
 

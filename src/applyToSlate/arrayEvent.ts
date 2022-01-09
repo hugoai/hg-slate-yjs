@@ -1,4 +1,4 @@
-import { Editor, Node, NodeOperation, Text } from 'slate';
+import { NodeOperation } from 'slate';
 import invariant from 'tiny-invariant';
 import * as Y from 'yjs';
 import { SyncElement } from '../model';
@@ -10,20 +10,12 @@ import { toSlateNode, toSlatePath } from '../utils/convert';
  * @param event
  */
 export default function translateArrayEvent(
-  editor: Editor,
   event: Y.YArrayEvent<SyncElement>
 ): NodeOperation[] {
   const targetPath = toSlatePath(event.path);
-  const targetElement = Node.get(editor, targetPath);
-
-  invariant(
-    !Text.isText(targetElement),
-    'Cannot apply array event to text node'
-  );
 
   let offset = 0;
   const ops: NodeOperation[] = [];
-  const children = Array.from(targetElement.children);
 
   event.changes.delta.forEach((delta) => {
     if ('retain' in delta) {
@@ -31,10 +23,15 @@ export default function translateArrayEvent(
     }
 
     if ('delete' in delta) {
-      const path = [...targetPath, offset];
-      children.splice(offset, delta.delete ?? 0).forEach((node) => {
-        ops.push({ type: 'remove_node', path, node });
-      });
+      const removePath = [...targetPath, offset];
+      const d = delta.delete || 0;
+      for (let i = 0; i < d; i += 1) {
+        ops.push({
+          type: 'remove_node',
+          path: removePath,
+          node: { children: [] },
+        });
+      }
     }
 
     if ('insert' in delta) {
@@ -55,7 +52,6 @@ export default function translateArrayEvent(
         });
       });
 
-      children.splice(offset, 0, ...toInsert);
       offset += delta.insert.length;
     }
   });
