@@ -5,9 +5,9 @@ import * as Y from 'yjs';
  *
  * @param event
  */
-export declare function translateYjsEvent(editor: Editor, event: Y.YEvent): Operation[];
+export declare function translateYjsEvent(event: Y.YEvent): Operation[];
 /**
  * Applies multiple yjs events to a slate editor.
  */
 export declare function applyYjsEvents(editor: Editor, events: Y.YEvent[]): void;
-export declare const toSlateOps: (editor: Editor, events: Y.YEvent[]) => Operation[];
+export declare const toSlateOps: (events: Y.YEvent[]) => Operation[];

@@ -1,4 +1,4 @@
-import { Editor, NodeOperation } from 'slate';
+import { NodeOperation } from 'slate';
 import * as Y from 'yjs';
 import { SyncElement } from '../model';
 /**
@@ -6,4 +6,4 @@ import { SyncElement } from '../model';
  *
  * @param event
  */
-export default function translateArrayEvent(editor: Editor, event: Y.YArrayEvent<SyncElement>): NodeOperation[];
+export default function translateArrayEvent(event: Y.YArrayEvent<SyncElement>): NodeOperation[];
